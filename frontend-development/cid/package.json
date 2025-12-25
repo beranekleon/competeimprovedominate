@@ -10,11 +10,15 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "^54.0.28",
+    "expo": "^54.0.30",
     "expo-status-bar": "^3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-dotenv": "^3.4.11"
+    "react-native": "0.81.5"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "babel-preset-expo": "^54.0.9",
+    "react-native-dotenv": "^3.4.11",
+    "@expo/ngrok": "^4.1.0"
+  }
 }
