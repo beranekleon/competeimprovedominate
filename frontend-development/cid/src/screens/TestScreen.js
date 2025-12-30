@@ -1,49 +1,76 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
-/**
- * TestScreen mit Eingabefeld für Benutzerdaten.
- * TestScreen with input field for user data.
- */
 export default function TestScreen({ data, loading, onTest, onLogout, userText, setUserText }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Dashboard / Testbereich</Text>
-      
-      {loading ? (
-        <ActivityIndicator size="large" color="#007AFF" />
-      ) : (
-        <Text style={styles.response}>{data || "Keine Daten empfangen"}</Text>
-      )}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Dashboard</Text>
+        
+        {/* Anzeige der System-Nachrichten (Login-Erfolg, Verbindungstest etc.) */}
+        <View style={styles.messageBox}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#007AFF" />
+          ) : (
+            <Text style={styles.messageText}>{data || "Bereit für Eingabe..."}</Text>
+          )}
+        </View>
 
-      {/** * Eingabefeld für die Persistenz-Übung 
-       * Input field for persistence exercise 
-       */}
-      <TextInput
-        style={styles.input}
-        placeholder="Schreibe etwas..."
-        value={userText}
-        onChangeText={setUserText}
-        multiline
-      />
+        <Text style={styles.label}>Deine Notizen (Cloud-Sync):</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Tippe hier deine Daten ein..."
+          value={userText}
+          onChangeText={setUserText}
+          multiline
+          numberOfLines={4}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={onTest}>
-        <Text style={styles.buttonText}>Verbindung testen</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.testButton} onPress={onTest}>
+          <Text style={styles.buttonText}>Verbindung testen</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={onLogout}>
-        <Text style={styles.buttonText}>Speichern & Ausloggen</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={onLogout}>
+          <Text style={styles.buttonText}>Speichern & Ausloggen</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
-  response: { padding: 15, backgroundColor: '#fff', borderRadius: 8, marginBottom: 20, textAlign: 'center' },
-  input: { width: '100%', height: 100, backgroundColor: '#fff', borderRadius: 8, padding: 15, marginBottom: 20, textAlignVertical: 'top', borderWidth: 1, borderColor: '#ddd' },
-  button: { backgroundColor: '#007AFF', padding: 15, borderRadius: 10, width: '100%', alignItems: 'center', marginBottom: 10 },
-  logoutButton: { backgroundColor: '#FF3B30' },
+  container: { flex: 1, backgroundColor: '#f8f9fa' },
+  scrollContainer: { alignItems: 'center', justifyContent: 'center', padding: 20, paddingTop: 60 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#333' },
+  messageBox: {
+    width: '100%',
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginBottom: 20,
+    minHeight: 60,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  messageText: { color: '#007AFF', textAlign: 'center', fontWeight: '500' },
+  label: { alignSelf: 'flex-start', marginBottom: 5, fontWeight: '600', color: '#666' },
+  input: {
+    width: '100%',
+    height: 120,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#ddd'
+  },
+  testButton: { backgroundColor: '#34C759', padding: 15, borderRadius: 10, width: '100%', alignItems: 'center', marginBottom: 10 },
+  logoutButton: { backgroundColor: '#FF3B30', padding: 15, borderRadius: 10, width: '100%', alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
 });

@@ -20,8 +20,8 @@ export default function App() {
   const API_URL = BACKEND_URL;
 
   /**
-   * Lädt den initialen Status (Kaltstart).
-   * Loads the initial state (cold start).
+   * Prüft beim Start, ob der User eingeloggt ist und stellt die Session wieder her.
+   * Checks on start if the user is logged in and restores the session.
    */
   useEffect(() => {
     const loadInitialState = async () => {
@@ -33,21 +33,25 @@ export default function App() {
         if (loggedIn === 'true' && savedEmail) {
           setUserEmail(savedEmail);
           setUserText(savedText || '');
+          // Hier setzen wir die Nachricht für den automatischen Login
+          setData("Willkommen zurück! (Automatisch angemeldet)");
           setCurrentScreen('TEST');
         }
-      } catch (e) { console.error(e); }
-      finally { setIsAppReady(true); }
+      } catch (e) {
+        console.error("Fehler beim Initialisieren:", e);
+      } finally {
+        setIsAppReady(true);
+      }
     };
     loadInitialState();
   }, []);
 
   /**
-   * Lokale Persistenz während der Session.
-   * Local persistence during the session.
+   * Lokale Echtzeit-Sicherung im AsyncStorage.
    */
   useEffect(() => {
     const saveLocally = async () => {
-      if (currentScreen === 'TEST') {
+      if (currentScreen === 'TEST' && isAppReady) {
         await AsyncStorage.setItem('@user_text', userText);
       }
     };
@@ -55,9 +59,46 @@ export default function App() {
   }, [userText]);
 
   /**
-   * Login-Funktion mit Daten-Abruf (Zwei-Wege-Sync).
-   * Login function with data retrieval (two-way sync).
+   * Testet die Erreichbarkeit des Backends.
    */
+  const testConnection = async () => {
+    setLoading(true);
+    setData(null); // Alte Nachricht löschen
+    try {
+      const response = await fetch(`${API_URL}/status`);
+      const json = await response.json();
+      setData(`Backend-Status: ${json.nachricht}`);
+    } catch (error) {
+      setData("Fehler: Verbindung zum Backend fehlgeschlagen.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (email, password) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const json = await response.json();
+      if (response.ok) {
+        setData(json.nachricht);
+        setCurrentScreen('TEST');
+      } else {
+        setData(json.fehler || "Registrierung fehlgeschlagen");
+        setCurrentScreen('TEST');
+      }
+    } catch (error) {
+      setData("Netzwerkfehler");
+      setCurrentScreen('TEST');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);
@@ -67,22 +108,15 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
       const json = await response.json();
 
       if (response.ok) {
-        /**
-         * Speichern der Identität und der vom Backend gelieferten Daten.
-         * Storing identity and data delivered by the backend.
-         */
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', json.user.userData || '');
-
         setUserEmail(email);
-        setUserText(json.user.userData || ''); // Daten in das Textfeld laden | Loading data into text field
-        
-        setData(`Willkommen zurück! Daten wurden geladen.`);
+        setUserText(json.user.userData || '');
+        setData(`Login erfolgreich! Daten wurden synchronisiert.`);
         setCurrentScreen('TEST');
       } else {
         setLoginError(json.fehler || "Login fehlgeschlagen");
@@ -94,26 +128,25 @@ export default function App() {
     }
   };
 
-  /**
-   * Logout mit abschließender Synchronisation.
-   * Logout with final synchronization.
-   */
   const handleLogout = async () => {
     setLoading(true);
     try {
+      // Synchronisation mit Backend vor dem Löschen
       await fetch(`${API_URL}/save-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, userData: userText }),
       });
-
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
       setUserEmail('');
       setUserText('');
       setData(null);
       setCurrentScreen('HOME');
-    } catch (e) { console.error(e); }
-    finally { setLoading(false); }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isAppReady) return null;
@@ -126,7 +159,16 @@ export default function App() {
     case 'REGISTER':
       return <RegisterScreen onRegister={handleRegister} onBack={() => setCurrentScreen('HOME')} />;
     case 'TEST':
-      return <TestScreen data={data} loading={loading} onTest={() => {}} onLogout={handleLogout} userText={userText} setUserText={setUserText} />;
+      return (
+        <TestScreen 
+          data={data} 
+          loading={loading} 
+          onTest={testConnection} // Hier war vorher eine leere Funktion!
+          onLogout={handleLogout} 
+          userText={userText} 
+          setUserText={setUserText} 
+        />
+      );
     default:
       return <HomeScreen onNavigateToLogin={() => setCurrentScreen('LOGIN')} />;
   }
