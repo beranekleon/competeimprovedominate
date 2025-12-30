@@ -1,136 +1,107 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const bcrypt = require('bcrypt');
-const { getFirestore } = require('firebase-admin/firestore'); // Import für benannte Datenbanken | Import for named databases
+const { getFirestore } = require('firebase-admin/firestore');
 
 const app = express();
-
-/**
- * Middleware zur Verarbeitung von JSON-Bodys.
- * Middleware for parsing JSON bodies.
- */
 app.use(express.json());
 
-/**
- * Initialisierung des Firebase Admin SDKs.
- * Initialization of the Firebase Admin SDK.
- */
-try {
-    if (!admin.apps.length) {
-        admin.initializeApp();
-    }
-} catch (initError) {
-    console.error("Initialisierungsfehler | Initialization Error:", initError);
+if (!admin.apps.length) {
+    admin.initializeApp();
 }
 
 /**
- * Zugriff auf eine benannte Firestore-Datenbankinstanz.
- * Accessing a named Firestore database instance.
+ * Zugriff auf die spezifische Firestore-Datenbankinstanz.
+ * Accessing the specific Firestore database instance.
  */
 const db = getFirestore("cid-development-database");
 
-/**
- * Standard-Endpunkt für den Integritätstest.
- * Standard endpoint for health checks.
- */
 app.get('/status', (req, res) => {
-    res.json({ nachricht: "Backend ist online und erreichbar!" });
+    res.json({ nachricht: "Backend ist online!" });
 });
 
 /**
- * POST-Endpunkt zur Benutzerregistrierung.
- * POST endpoint for user registration.
+ * Registrierung eines neuen Benutzers.
+ * Registration of a new user.
  */
 app.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ fehler: "Email und Passwort erforderlich." });
-        }
+        if (!email || !password) return res.status(400).json({ fehler: "Daten unvollständig." });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const userRef = db.collection('users').doc(email);
         const doc = await userRef.get();
 
-        if (doc.exists) {
-            return res.status(400).json({ fehler: "Benutzer existiert bereits." });
-        }
+        if (doc.exists) return res.status(400).json({ fehler: "Benutzer existiert bereits." });
 
         await userRef.set({
             email,
             password: hashedPassword,
+            userData: "", // Initial leerer Datensatz | Initially empty data record
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        res.status(201).json({ nachricht: "Benutzer erfolgreich registriert." });
+        res.status(201).json({ nachricht: "Registrierung erfolgreich." });
     } catch (error) {
-        console.error("Registrierungsfehler | Registration Error:", error);
+        res.status(500).json({ fehler: error.message });
+    }
+});
+
+/**
+ * Login-Endpunkt: Sendet jetzt auch vorhandene 'userData' zurück.
+ * Login endpoint: Now also returns existing 'userData'.
+ */
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+
+        if (!doc.exists) return res.status(401).json({ fehler: "Benutzer nicht gefunden." });
+
+        const user = doc.data();
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) return res.status(401).json({ fehler: "Ungültiges Passwort." });
+
+        /**
+         * Erfolg: Sende E-Mail und die gespeicherten Daten an die App.
+         * Success: Send email and stored data to the app.
+         */
+        res.status(200).json({ 
+            nachricht: "Login erfolgreich.",
+            user: { 
+                email: user.email,
+                userData: user.userData || "" // Rückgabe der Profildaten | Returning profile data
+            }
+        });
+    } catch (error) {
         res.status(500).json({ fehler: "Interner Serverfehler." });
     }
 });
 
 /**
- * REST-Endpunkt zur Benutzerauthentifizierung (POST /login).
- * Vergleicht das eingegebene Passwort mit dem verschlüsselten Hash in Firestore.
- * REST endpoint for user authentication (POST /login).
- * Compares the provided password with the encrypted hash in Firestore.
+ * Speichern der Benutzerdaten.
+ * Saving user data.
  */
-app.post('/login', async (req, res) => {
+app.post('/save-data', async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        /**
-         * Validierung der Eingabeparameter.
-         * Input parameter validation.
-         */
-        if (!email || !password) {
-            return res.status(400).json({ fehler: "Email und Passwort erforderlich." });
-        }
-
-        /**
-         * Abruf des Benutzerdokuments aus der 'users'-Collection.
-         * Retrieval of the user document from the 'users' collection.
-         */
+        const { email, userData } = req.body;
         const userRef = db.collection('users').doc(email);
-        const doc = await userRef.get();
-
-        if (!doc.exists) {
-            return res.status(401).json({ fehler: "Benutzer nicht gefunden." });
-        }
-
-        const user = doc.data();
-
-        /**
-         * Vergleich des Klartext-Passworts mit dem gespeicherten Hash.
-         * Comparison of the plain text password with the stored hash.
-         */
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ fehler: "Ungültiges Passwort." });
-        }
-
-        /**
-         * Erfolgreiche Authentifizierung.
-         * Successful authentication.
-         */
-        res.status(200).json({ 
-            nachricht: "Login erfolgreich.",
-            user: { email: user.email }
+        
+        await userRef.update({
+            userData: userData,
+            lastUpdate: admin.firestore.FieldValue.serverTimestamp()
         });
 
+        res.status(200).json({ nachricht: "Daten synchronisiert." });
     } catch (error) {
-        console.error("Loginfehler | Login Error:", error);
-        res.status(500).json({ fehler: "Interner Serverfehler beim Login." });
+        res.status(500).json({ fehler: "Fehler beim Speichern." });
     }
 });
 
-/**
- * Starten des Servers auf dem von Cloud Run zugewiesenen Port.
- * Starting the server on the port assigned by Cloud Run.
- */
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server gestartet auf Port ${PORT} | Server started on port ${PORT}`);
+    console.log(`Server läuft auf Port ${PORT}`);
 });

@@ -1,59 +1,49 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 /**
- * Bildschirm zur Überprüfung der Backend-Konnektivität (Durchstichtest).
- * Screen to verify backend connectivity (connection test).
+ * TestScreen mit Eingabefeld für Benutzerdaten.
+ * TestScreen with input field for user data.
  */
-export default function TestScreen({ data, loading, onTest, onLogout }) {
+export default function TestScreen({ data, loading, onTest, onLogout, userText, setUserText }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>API Durchstich Test</Text>
+      <Text style={styles.title}>Dashboard / Testbereich</Text>
       
-      {/* Ausführung des API-Tests | Execution of the API test */}
-      <Button title="Backend anfunken" onPress={onTest} />
-
-      {/* Ladeanzeige während des Fetch-Vorgangs | Loading indicator during fetch process */}
-      {loading && <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />}
-      
-      {/* Anzeige der Backend-Antwort | Display of backend response */}
-      {data && (
-        <View style={styles.resultBox}>
-          <Text>Antwort vom Server:</Text>
-          <Text style={styles.resultText}>{data}</Text>
-        </View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007AFF" />
+      ) : (
+        <Text style={styles.response}>{data || "Keine Daten empfangen"}</Text>
       )}
 
-      {/* Logout-Button zur Rückkehr zum Start | Logout button to return to start */}
-      <View style={{ marginTop: 50 }}>
-        <Button title="Logout" onPress={onLogout} color="red" />
-      </View>
+      {/** * Eingabefeld für die Persistenz-Übung 
+       * Input field for persistence exercise 
+       */}
+      <TextInput
+        style={styles.input}
+        placeholder="Schreibe etwas..."
+        value={userText}
+        onChangeText={setUserText}
+        multiline
+      />
+
+      <TouchableOpacity style={styles.button} onPress={onTest}>
+        <Text style={styles.buttonText}>Verbindung testen</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={onLogout}>
+        <Text style={styles.buttonText}>Speichern & Ausloggen</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff'
-  },
-  title: {
-    fontSize: 22,
-    marginBottom: 20,
-    fontWeight: 'bold'
-  },
-  resultBox: {
-    marginTop: 30,
-    padding: 15,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10
-  },
-  resultText: {
-    fontSize: 18,
-    color: 'green',
-    fontWeight: 'bold'
-  }
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
+  response: { padding: 15, backgroundColor: '#fff', borderRadius: 8, marginBottom: 20, textAlign: 'center' },
+  input: { width: '100%', height: 100, backgroundColor: '#fff', borderRadius: 8, padding: 15, marginBottom: 20, textAlignVertical: 'top', borderWidth: 1, borderColor: '#ddd' },
+  button: { backgroundColor: '#007AFF', padding: 15, borderRadius: 10, width: '100%', alignItems: 'center', marginBottom: 10 },
+  logoutButton: { backgroundColor: '#FF3B30' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
 });
