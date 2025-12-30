@@ -71,6 +71,62 @@ app.post('/register', async (req, res) => {
 });
 
 /**
+ * REST-Endpunkt zur Benutzerauthentifizierung (POST /login).
+ * Vergleicht das eingegebene Passwort mit dem verschlüsselten Hash in Firestore.
+ * REST endpoint for user authentication (POST /login).
+ * Compares the provided password with the encrypted hash in Firestore.
+ */
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        /**
+         * Validierung der Eingabeparameter.
+         * Input parameter validation.
+         */
+        if (!email || !password) {
+            return res.status(400).json({ fehler: "Email und Passwort erforderlich." });
+        }
+
+        /**
+         * Abruf des Benutzerdokuments aus der 'users'-Collection.
+         * Retrieval of the user document from the 'users' collection.
+         */
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+            return res.status(401).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        const user = doc.data();
+
+        /**
+         * Vergleich des Klartext-Passworts mit dem gespeicherten Hash.
+         * Comparison of the plain text password with the stored hash.
+         */
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ fehler: "Ungültiges Passwort." });
+        }
+
+        /**
+         * Erfolgreiche Authentifizierung.
+         * Successful authentication.
+         */
+        res.status(200).json({ 
+            nachricht: "Login erfolgreich.",
+            user: { email: user.email }
+        });
+
+    } catch (error) {
+        console.error("Loginfehler | Login Error:", error);
+        res.status(500).json({ fehler: "Interner Serverfehler beim Login." });
+    }
+});
+
+/**
  * Starten des Servers auf dem von Cloud Run zugewiesenen Port.
  * Starting the server on the port assigned by Cloud Run.
  */

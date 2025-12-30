@@ -1,28 +1,43 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Button } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button } from 'react-native';
 
 /**
- * Simulierter Login-Bildschirm zur Vorbereitung der User-Authentifizierung.
- * Simulated login screen for upcoming user authentication implementation.
+ * Komponente für das Login-Formular.
+ * Component for the login form.
+ * * @param {Object} props - Funktionen für Login und Navigation | Functions for login and navigation
  */
-export default function LoginScreen({ onLoginSuccess, onBack }) {
+export default function LoginScreen({ onLogin, onBack }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login Bereich</Text>
-      <Text style={styles.infoText}>
-        Hier kannst du dich später mit deinem Account anmelden.
-        You will be able to log in with your account here later.
-      </Text>
+      <Text style={styles.title}>Login</Text>
       
-      {/* Button zur Simulation eines erfolgreichen Logins | Button to simulate successful login */}
+      <TextInput
+        style={styles.input}
+        placeholder="E-Mail"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Passwort"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      
       <TouchableOpacity 
         style={styles.mainButton} 
-        onPress={onLoginSuccess}
+        onPress={() => onLogin(email, password)}
       >
-        <Text style={styles.buttonText}>Einloggen (Simuliert)</Text>
+        <Text style={styles.buttonText}>Anmelden</Text>
       </TouchableOpacity>
 
-      {/* Rücknavigation zum HomeScreen | Navigation back to HomeScreen */}
       <Button title="Zurück" onPress={onBack} color="gray" />
     </View>
   );
@@ -37,21 +52,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   title: {
-    fontSize: 24,
-    marginBottom: 20,
-    fontWeight: 'bold'
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 20
   },
-  infoText: {
-    textAlign: 'center',
-    marginBottom: 30,
-    color: '#666'
+  input: {
+    width: '100%',
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    backgroundColor: '#fafafa'
   },
   mainButton: {
     backgroundColor: '#007AFF',
     paddingVertical: 15,
-    paddingHorizontal: 40,
     borderRadius: 10,
-    marginBottom: 20
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10
   },
   buttonText: {
     color: '#fff',
