@@ -1,11 +1,12 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 const { getFirestore } = require('firebase-admin/firestore');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 if (!admin.apps.length) {
     admin.initializeApp();
