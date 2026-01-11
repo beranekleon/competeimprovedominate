@@ -122,7 +122,8 @@ export default function App() {
         setLoginError(json.fehler || "Login fehlgeschlagen");
       }
     } catch (error) {
-      setLoginError("Netzwerkfehler beim Login");
+    console.log("Detaillierter Fehler:", error);
+    setLoginError("Netzwerkfehler beim Login");
     } finally {
       setLoading(false);
     }
