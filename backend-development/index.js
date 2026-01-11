@@ -19,7 +19,7 @@ if (!admin.apps.length) {
 const db = getFirestore("cid-development-database");
 
 app.get('/status', (req, res) => {
-    res.json({ nachricht: "Backend ist online!" });
+    res.json({ nachricht: "Backend ist online! Hallo Welt!" });
 });
 
 /**
