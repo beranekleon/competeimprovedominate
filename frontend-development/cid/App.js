@@ -1,27 +1,32 @@
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACKEND_URL } from '@env';
 
+// Screens importieren
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import TestScreen from './src/screens/TestScreen';
 
-export default function App() {
-  const [currentScreen, setCurrentScreen] = useState('HOME');
-  const [isAppReady, setIsAppReady] = useState(false);
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState(null);
+const Stack = createStackNavigator();
 
+export default function App() {
+  // State-Management
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAppReady, setIsAppReady] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userText, setUserText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null); // Für /status Nachrichten
+  const [loginError, setLoginError] = useState(null);
 
   const API_URL = BACKEND_URL;
 
   /**
-   * Prüft beim Start, ob der User eingeloggt ist und stellt die Session wieder her.
-   * Checks on start if the user is logged in and restores the session.
+   * Stellt die Sitzung beim App-Start wieder her.
    */
   useEffect(() => {
     const loadInitialState = async () => {
@@ -33,12 +38,10 @@ export default function App() {
         if (loggedIn === 'true' && savedEmail) {
           setUserEmail(savedEmail);
           setUserText(savedText || '');
-          // Hier setzen wir die Nachricht für den automatischen Login
-          setData("Willkommen zurück! (Automatisch angemeldet)");
-          setCurrentScreen('TEST');
+          setIsLoggedIn(true);
         }
       } catch (e) {
-        console.error("Fehler beim Initialisieren:", e);
+        console.error("Fehler beim Laden des lokalen Speichers:", e);
       } finally {
         setIsAppReady(true);
       }
@@ -47,58 +50,25 @@ export default function App() {
   }, []);
 
   /**
-   * Lokale Echtzeit-Sicherung im AsyncStorage.
-   */
-  useEffect(() => {
-    const saveLocally = async () => {
-      if (currentScreen === 'TEST' && isAppReady) {
-        await AsyncStorage.setItem('@user_text', userText);
-      }
-    };
-    saveLocally();
-  }, [userText]);
-
-  /**
-   * Testet die Erreichbarkeit des Backends.
+   * Testet die Verbindung zum Backend (/status).
    */
   const testConnection = async () => {
     setLoading(true);
-    setData(null); // Alte Nachricht löschen
     try {
       const response = await fetch(`${API_URL}/status`);
       const json = await response.json();
-      setData(`Backend-Status: ${json.nachricht}`);
-    } catch (error) {
-      setData("Fehler: Verbindung zum Backend fehlgeschlagen.");
+      setData(json.nachricht);
+    } catch (e) {
+      setData("Verbindungsfehler: Backend nicht erreichbar");
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRegister = async (email, password) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const json = await response.json();
-      if (response.ok) {
-        setData(json.nachricht);
-        setCurrentScreen('TEST');
-      } else {
-        setData(json.fehler || "Registrierung fehlgeschlagen");
-        setCurrentScreen('TEST');
-      }
-    } catch (error) {
-      setData("Netzwerkfehler");
-      setCurrentScreen('TEST');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  /**
+   * Loggt den Benutzer ein und speichert die Session.
+   */
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);
@@ -111,66 +81,94 @@ export default function App() {
       const json = await response.json();
 
       if (response.ok) {
+        // Daten lokal speichern
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', json.user.userData || '');
+        
+        // App State aktualisieren
         setUserEmail(email);
         setUserText(json.user.userData || '');
-        setData(`Login erfolgreich! Daten wurden synchronisiert.`);
-        setCurrentScreen('TEST');
+        setIsLoggedIn(true);
       } else {
         setLoginError(json.fehler || "Login fehlgeschlagen");
       }
-    } catch (error) {
-    console.log("Detaillierter Fehler:", error);
-    setLoginError("Netzwerkfehler beim Login");
+    } catch (e) {
+      setLoginError("Netzwerkfehler: Bitte Internetverbindung prüfen");
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Speichert die Daten in der Cloud und loggt den User aus.
+   */
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // Synchronisation mit Backend vor dem Löschen
+      // 1. Synchronisation mit Firestore
       await fetch(`${API_URL}/save-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, userData: userText }),
       });
+
+      // 2. Lokale Daten löschen
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
+      
+      // 3. States zurücksetzen
       setUserEmail('');
       setUserText('');
       setData(null);
-      setCurrentScreen('HOME');
+      setIsLoggedIn(false);
     } catch (e) {
-      console.error(e);
+      console.error("Fehler beim Logout/Sync:", e);
+      alert("Fehler beim Speichern. Du wirst trotzdem ausgeloggt.");
+      setIsLoggedIn(false);
     } finally {
       setLoading(false);
     }
   };
 
+  // Splash-Screen Logik (wartet bis AsyncStorage bereit ist)
   if (!isAppReady) return null;
 
-  switch (currentScreen) {
-    case 'HOME':
-      return <HomeScreen onNavigateToLogin={() => setCurrentScreen('LOGIN')} onNavigateToRegister={() => setCurrentScreen('REGISTER')} />;
-    case 'LOGIN':
-      return <LoginScreen onLogin={handleLogin} errorMessage={loginError} onBack={() => setCurrentScreen('HOME')} />;
-    case 'REGISTER':
-      return <RegisterScreen onRegister={handleRegister} onBack={() => setCurrentScreen('HOME')} />;
-    case 'TEST':
-      return (
-        <TestScreen 
-          data={data} 
-          loading={loading} 
-          onTest={testConnection} // Hier war vorher eine leere Funktion!
-          onLogout={handleLogout} 
-          userText={userText} 
-          setUserText={setUserText} 
-        />
-      );
-    default:
-      return <HomeScreen onNavigateToLogin={() => setCurrentScreen('LOGIN')} />;
-  }
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? (
+          // Eingeloggter Bereich
+          <Stack.Screen name="Dashboard">
+            {(props) => (
+              <TestScreen 
+                {...props} 
+                userText={userText} 
+                setUserText={setUserText} 
+                onLogout={handleLogout} 
+                onTest={testConnection}
+                data={data}
+                loading={loading}
+              />
+            )}
+          </Stack.Screen>
+        ) : (
+          // Nicht eingeloggter Bereich
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Login">
+              {(props) => (
+                <LoginScreen 
+                  {...props} 
+                  onLogin={handleLogin} 
+                  errorMessage={loginError} 
+                  loading={loading}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Register" component={RegisterScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
