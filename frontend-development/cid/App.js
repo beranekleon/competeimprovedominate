@@ -85,7 +85,7 @@ export default function App() {
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', json.user.userData || '');
-        
+
         // App State aktualisieren
         setUserEmail(email);
         setUserText(json.user.userData || '');
@@ -115,7 +115,7 @@ export default function App() {
 
       // 2. Lokale Daten löschen
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
-      
+
       // 3. States zurücksetzen
       setUserEmail('');
       setUserText('');
@@ -125,6 +125,49 @@ export default function App() {
       console.error("Fehler beim Logout/Sync:", e);
       alert("Fehler beim Speichern. Du wirst trotzdem ausgeloggt.");
       setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * ✅ Nutzerkonto löschen (Backend) + lokale Session löschen
+   * Erwartet Backend Endpoint: POST /delete-account  Body: { email }
+   */
+  const handleDeleteAccount = async () => {
+    if (!userEmail) {
+      alert("Kein User eingeloggt.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/delete-account`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const json = await response.json();
+
+      if (!response.ok) {
+        alert(json.fehler || "Konto konnte nicht gelöscht werden.");
+        return;
+      }
+
+      // lokale Session löschen
+      await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
+
+      // States reset
+      setUserEmail('');
+      setUserText('');
+      setData(null);
+      setIsLoggedIn(false);
+
+      alert("Konto wurde gelöscht.");
+    } catch (e) {
+      console.error("Fehler beim Konto löschen:", e);
+      alert("Netzwerkfehler: Konto konnte nicht gelöscht werden.");
     } finally {
       setLoading(false);
     }
@@ -140,12 +183,13 @@ export default function App() {
           // Eingeloggter Bereich
           <Stack.Screen name="Dashboard">
             {(props) => (
-              <TestScreen 
-                {...props} 
-                userText={userText} 
-                setUserText={setUserText} 
-                onLogout={handleLogout} 
+              <TestScreen
+                {...props}
+                userText={userText}
+                setUserText={setUserText}
+                onLogout={handleLogout}
                 onTest={testConnection}
+                onDeleteAccount={handleDeleteAccount}   // ✅ HIER
                 data={data}
                 loading={loading}
               />
@@ -157,10 +201,10 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Login">
               {(props) => (
-                <LoginScreen 
-                  {...props} 
-                  onLogin={handleLogin} 
-                  errorMessage={loginError} 
+                <LoginScreen
+                  {...props}
+                  onLogin={handleLogin}
+                  errorMessage={loginError}
                   loading={loading}
                 />
               )}
