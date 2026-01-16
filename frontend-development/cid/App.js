@@ -14,20 +14,17 @@ import TestScreen from './src/screens/TestScreen';
 const Stack = createStackNavigator();
 
 export default function App() {
-  // State-Management
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAppReady, setIsAppReady] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userText, setUserText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null); // Für /status Nachrichten
+  const [data, setData] = useState(null); 
   const [loginError, setLoginError] = useState(null);
 
   const API_URL = BACKEND_URL;
 
-  /**
-   * Stellt die Sitzung beim App-Start wieder her.
-   */
+  // 1. INITIALES LADEN: Sitzung beim App-Start wiederherstellen
   useEffect(() => {
     const loadInitialState = async () => {
       try {
@@ -41,7 +38,7 @@ export default function App() {
           setIsLoggedIn(true);
         }
       } catch (e) {
-        console.error("Fehler beim Laden des lokalen Speichers:", e);
+        console.error("Fehler beim Laden:", e);
       } finally {
         setIsAppReady(true);
       }
@@ -49,9 +46,23 @@ export default function App() {
     loadInitialState();
   }, []);
 
-  /**
-   * Testet die Verbindung zum Backend (/status).
-   */
+  // 2. NEU: AUTO-SAVE LOGIK
+  // Speichert den Text lokal auf dem Handy, sobald er sich ändert
+  useEffect(() => {
+    const saveProgressLocally = async () => {
+      if (isLoggedIn && isAppReady) {
+        try {
+          await AsyncStorage.setItem('@user_text', userText);
+          // console.log("Lokal zwischengespeichert"); // Zum Debuggen
+        } catch (e) {
+          console.error("Fehler beim Zwischenspeichern:", e);
+        }
+      }
+    };
+    saveProgressLocally();
+  }, [userText, isLoggedIn, isAppReady]);
+
+  // 3. VERBINDUNGSTEST (/status)
   const testConnection = async () => {
     setLoading(true);
     try {
@@ -59,16 +70,13 @@ export default function App() {
       const json = await response.json();
       setData(json.nachricht);
     } catch (e) {
-      setData("Verbindungsfehler: Backend nicht erreichbar");
-      console.error(e);
+      setData("Verbindungsfehler");
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Loggt den Benutzer ein und speichert die Session.
-   */
+  // 4. LOGIN HANDLER
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);
@@ -81,12 +89,10 @@ export default function App() {
       const json = await response.json();
 
       if (response.ok) {
-        // Daten lokal speichern
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', json.user.userData || '');
         
-        // App State aktualisieren
         setUserEmail(email);
         setUserText(json.user.userData || '');
         setIsLoggedIn(true);
@@ -94,50 +100,44 @@ export default function App() {
         setLoginError(json.fehler || "Login fehlgeschlagen");
       }
     } catch (e) {
-      setLoginError("Netzwerkfehler: Bitte Internetverbindung prüfen");
+      setLoginError("Netzwerkfehler");
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Speichert die Daten in der Cloud und loggt den User aus.
-   */
+  // 5. LOGOUT HANDLER (mit Cloud-Sync)
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // 1. Synchronisation mit Firestore
+      // Synchronisation mit Firestore
       await fetch(`${API_URL}/save-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, userData: userText }),
       });
 
-      // 2. Lokale Daten löschen
+      // Lokale Daten erst NACH dem Sync löschen
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
       
-      // 3. States zurücksetzen
       setUserEmail('');
       setUserText('');
       setData(null);
       setIsLoggedIn(false);
     } catch (e) {
-      console.error("Fehler beim Logout/Sync:", e);
-      alert("Fehler beim Speichern. Du wirst trotzdem ausgeloggt.");
-      setIsLoggedIn(false);
+      console.error("Sync-Fehler beim Logout:", e);
+      setIsLoggedIn(false); // Trotzdem ausloggen
     } finally {
       setLoading(false);
     }
   };
 
-  // Splash-Screen Logik (wartet bis AsyncStorage bereit ist)
   if (!isAppReady) return null;
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isLoggedIn ? (
-          // Eingeloggter Bereich
           <Stack.Screen name="Dashboard">
             {(props) => (
               <TestScreen 
@@ -152,7 +152,6 @@ export default function App() {
             )}
           </Stack.Screen>
         ) : (
-          // Nicht eingeloggter Bereich
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Login">
