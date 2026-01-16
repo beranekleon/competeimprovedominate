@@ -42,4 +42,4 @@ yarn-error.*
 .env
 
 # JetBrains
-.idea/s
+.idea/
