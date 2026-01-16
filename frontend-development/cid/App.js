@@ -92,12 +92,7 @@ export default function App() {
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', json.user.userData || '');
-<<<<<<< HEAD
-
-        // App State aktualisieren
-=======
         
->>>>>>> 017c5743c29f6f3112d146f281014f14c63b21ab
         setUserEmail(email);
         setUserText(json.user.userData || '');
         setIsLoggedIn(true);
@@ -124,12 +119,7 @@ export default function App() {
 
       // Lokale Daten erst NACH dem Sync löschen
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
-<<<<<<< HEAD
-
-      // 3. States zurücksetzen
-=======
       
->>>>>>> 017c5743c29f6f3112d146f281014f14c63b21ab
       setUserEmail('');
       setUserText('');
       setData(null);
@@ -142,53 +132,6 @@ export default function App() {
     }
   };
 
-<<<<<<< HEAD
-  /**
-   * ✅ Nutzerkonto löschen (Backend) + lokale Session löschen
-   * Erwartet Backend Endpoint: POST /delete-account  Body: { email }
-   */
-  const handleDeleteAccount = async () => {
-    if (!userEmail) {
-      alert("Kein User eingeloggt.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/delete-account`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: userEmail }),
-      });
-
-      const json = await response.json();
-
-      if (!response.ok) {
-        alert(json.fehler || "Konto konnte nicht gelöscht werden.");
-        return;
-      }
-
-      // lokale Session löschen
-      await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
-
-      // States reset
-      setUserEmail('');
-      setUserText('');
-      setData(null);
-      setIsLoggedIn(false);
-
-      alert("Konto wurde gelöscht.");
-    } catch (e) {
-      console.error("Fehler beim Konto löschen:", e);
-      alert("Netzwerkfehler: Konto konnte nicht gelöscht werden.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Splash-Screen Logik (wartet bis AsyncStorage bereit ist)
-=======
->>>>>>> 017c5743c29f6f3112d146f281014f14c63b21ab
   if (!isAppReady) return null;
 
   return (
