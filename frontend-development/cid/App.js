@@ -24,7 +24,7 @@ export default function App() {
 
   const API_URL = BACKEND_URL;
 
-  // 1. INITIALES LADEN: Sitzung beim App-Start wiederherstellen
+  // 1. Sitzung beim App-Start wiederherstellen
   useEffect(() => {
     const loadInitialState = async () => {
       try {
@@ -46,23 +46,7 @@ export default function App() {
     loadInitialState();
   }, []);
 
-  // 2. NEU: AUTO-SAVE LOGIK
-  // Speichert den Text lokal auf dem Handy, sobald er sich ändert
-  useEffect(() => {
-    const saveProgressLocally = async () => {
-      if (isLoggedIn && isAppReady) {
-        try {
-          await AsyncStorage.setItem('@user_text', userText);
-          // console.log("Lokal zwischengespeichert"); // Zum Debuggen
-        } catch (e) {
-          console.error("Fehler beim Zwischenspeichern:", e);
-        }
-      }
-    };
-    saveProgressLocally();
-  }, [userText, isLoggedIn, isAppReady]);
-
-  // 3. VERBINDUNGSTEST (/status)
+  // 2. Verbindungstest
   const testConnection = async () => {
     setLoading(true);
     try {
@@ -76,7 +60,7 @@ export default function App() {
     }
   };
 
-  // 4. LOGIN HANDLER
+  // 3. Login
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);
@@ -91,10 +75,10 @@ export default function App() {
       if (response.ok) {
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
-        await AsyncStorage.setItem('@user_text', json.user.userData || '');
+        await AsyncStorage.setItem('@user_text', JSON.stringify(json.user.userData) || '');
         
         setUserEmail(email);
-        setUserText(json.user.userData || '');
+        setUserText(typeof json.user.userData === 'object' ? JSON.stringify(json.user.userData) : json.user.userData);
         setIsLoggedIn(true);
       } else {
         setLoginError(json.fehler || "Login fehlgeschlagen");
@@ -106,27 +90,50 @@ export default function App() {
     }
   };
 
-  // 5. LOGOUT HANDLER (mit Cloud-Sync)
+  // 4. Logout (mit Cloud-Sync)
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // Synchronisation mit Firestore
       await fetch(`${API_URL}/save-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: userEmail, userData: userText }),
       });
-
-      // Lokale Daten erst NACH dem Sync löschen
       await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
-      
+      setIsLoggedIn(false);
       setUserEmail('');
       setUserText('');
       setData(null);
-      setIsLoggedIn(false);
     } catch (e) {
-      console.error("Sync-Fehler beim Logout:", e);
-      setIsLoggedIn(false); // Trotzdem ausloggen
+      console.error("Sync-Fehler:", e);
+      setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 5. NEU: Account löschen Logik
+  const handleDeleteAccount = async (password) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/delete-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, password }),
+      });
+      const json = await response.json();
+
+      if (response.ok) {
+        await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
+        setIsLoggedIn(false);
+        setUserEmail('');
+        setUserText('');
+        alert("Konto erfolgreich gelöscht.");
+      } else {
+        alert(json.fehler || "Fehler beim Löschen.");
+      }
+    } catch (e) {
+      alert("Netzwerkfehler beim Löschen.");
     } finally {
       setLoading(false);
     }
@@ -140,13 +147,13 @@ export default function App() {
         {isLoggedIn ? (
           <Stack.Screen name="Dashboard">
             {(props) => (
-              <TestScreen
-                {...props}
-                userText={userText}
-                setUserText={setUserText}
-                onLogout={handleLogout}
+              <TestScreen 
+                {...props} 
+                userText={userText} 
+                setUserText={setUserText} 
+                onLogout={handleLogout} 
                 onTest={testConnection}
-                onDeleteAccount={handleDeleteAccount}   // ✅ HIER
+                onDeleteAccount={handleDeleteAccount} // Hier wird die Funktion übergeben
                 data={data}
                 loading={loading}
               />
@@ -157,12 +164,7 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Login">
               {(props) => (
-                <LoginScreen
-                  {...props}
-                  onLogin={handleLogin}
-                  errorMessage={loginError}
-                  loading={loading}
-                />
+                <LoginScreen {...props} onLogin={handleLogin} errorMessage={loginError} loading={loading} />
               )}
             </Stack.Screen>
             <Stack.Screen name="Register" component={RegisterScreen} />
