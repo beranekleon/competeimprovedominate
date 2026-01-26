@@ -124,7 +124,12 @@ app.post('/save-data', async (req, res) => {
 
         res.status(200).json({ nachricht: "Tracking-Daten erfolgreich synchronisiert." });
     } catch (error) {
+<<<<<<< Updated upstream
         res.status(500).json({ fehler: `Fehler beim Speichern: ${error.message}` });
+=======
+        res.status(500).json({ fehler: `Fehler beim Speichern der Daten: ${error.message}` });
+
+>>>>>>> Stashed changes
     }
 });
 
