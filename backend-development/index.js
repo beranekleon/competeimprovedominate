@@ -5,32 +5,26 @@ const cors = require('cors');
 const { getFirestore } = require('firebase-admin/firestore');
 
 const app = express();
-app.use(cors()); // Ermöglicht Cross-Origin-Requests von deiner App
-app.use(express.json()); // Parst JSON-Bodies in Requests
+app.use(cors());           // Ermöglicht Cross-Origin-Requests von deiner App
+app.use(express.json());   // Parst JSON-Bodies in Requests
 
-// Initialisiere Firebase-Admin, falls noch nicht geschehen
+// Firebase Admin nur einmal initialisieren
 if (!admin.apps.length) {
     admin.initializeApp();
+    // Falls du später Credentials brauchst → hier einfügen:
+    // admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 }
 
-/**
- * Zugriff auf die spezifische Firestore-Datenbankinstanz.
- */
 const db = getFirestore("cid-development-database");
 
-// --- ENDPUNKTE ---
+// ────────────────────────────────────────────────
+// Endpunkte
+// ────────────────────────────────────────────────
 
-/**
- * Status-Endpoint zum Testen der Erreichbarkeit.
- */
 app.get('/status', (req, res) => {
     res.json({ nachricht: "Backend ist online! Hallo Welt!" });
 });
 
-/**
- * Registrierung eines neuen Benutzers.
- * Kombiniert deine Statusmeldungen mit der neuen, erweiterten Datenstruktur.
- */
 app.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -64,9 +58,6 @@ app.post('/register', async (req, res) => {
     }
 });
 
-/**
- * Login-Endpunkt: Überprüft Credentials und sendet gespeicherte Daten zurück.
- */
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -100,9 +91,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-/**
- * Speichern/Synchronisieren von Benutzerdaten.
- */
 app.post('/save-data', async (req, res) => {
     try {
         const { email, userData } = req.body;
@@ -124,19 +112,10 @@ app.post('/save-data', async (req, res) => {
 
         res.status(200).json({ nachricht: "Tracking-Daten erfolgreich synchronisiert." });
     } catch (error) {
-<<<<<<< Updated upstream
-        res.status(500).json({ fehler: `Fehler beim Speichern: ${error.message}` });
-=======
         res.status(500).json({ fehler: `Fehler beim Speichern der Daten: ${error.message}` });
-
->>>>>>> Stashed changes
     }
 });
 
-/**
- * NEU: Benutzerkonto löschen.
- * Überprüft das Passwort, bevor das Dokument aus Firestore entfernt wird.
- */
 app.post('/delete-user', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -166,7 +145,38 @@ app.post('/delete-user', async (req, res) => {
     }
 });
 
-// Server-Konfiguration
+// ────────────────────────────────────────────────
+// Google-Login-Skizze (noch nicht vollständig implementiert)
+// ────────────────────────────────────────────────
+
+app.post('/google-login', async (req, res) => {
+    try {
+        const { idToken } = req.body;
+
+        if (!idToken) {
+            return res.status(400).json({ fehler: "idToken fehlt." });
+        }
+
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const email = decodedToken.email;
+
+        // Hier könntest du nun den Firestore-Eintrag suchen/erstelle/synchronisieren
+        // z. B. wie bei /register oder /save-data ...
+
+        res.status(200).json({
+            nachricht: "Google-Login erfolgreich",
+            email,
+            // userData: ... ggf. aus Firestore laden
+        });
+    } catch (error) {
+        res.status(401).json({ fehler: `Ungültiger Token: ${error.message}` });
+    }
+});
+
+// ────────────────────────────────────────────────
+// Server starten
+// ────────────────────────────────────────────────
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server läuft auf Port ${PORT}`);
