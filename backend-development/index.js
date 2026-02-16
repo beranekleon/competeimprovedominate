@@ -8,6 +8,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const app = express();
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 app.use(cors());           // Ermöglicht Cross-Origin-Requests von deiner App
 app.use(express.json());   // Parst JSON-Bodies in Requests
 
@@ -30,16 +31,26 @@ app.use(express.json());
 if (!admin.apps.length) {
   admin.initializeApp();
 >>>>>>> Stashed changes
+=======
+app.use(cors());
+app.use(express.json());
+
+if (!admin.apps.length) {
+  admin.initializeApp();
+>>>>>>> Stashed changes
 }
 
 const db = getFirestore("cid-development-database");
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // ────────────────────────────────────────────────
 // Endpunkte
 // ────────────────────────────────────────────────
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 // ---- Optional E-Mail Versand (DEV fallback = console.log) ----
@@ -166,6 +177,7 @@ app.post('/save-data', async (req, res) => {
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         const userRef = db.collection('users').doc(email);
         const doc = await userRef.get();
 
@@ -181,6 +193,10 @@ app.post('/save-data', async (req, res) => {
         res.status(200).json({ nachricht: "Tracking-Daten erfolgreich synchronisiert." });
     } catch (error) {
         res.status(500).json({ fehler: `Fehler beim Speichern der Daten: ${error.message}` });
+=======
+    if (!email) {
+      return res.status(400).json({ fehler: "E-Mail fehlt." });
+>>>>>>> Stashed changes
 =======
     if (!email) {
       return res.status(400).json({ fehler: "E-Mail fehlt." });
@@ -208,6 +224,8 @@ app.post('/save-data', async (req, res) => {
     res.status(500).json({ fehler: `Fehler beim Speichern der Daten: ${error.message}` });
   }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
 =======
 });
 
@@ -244,6 +262,78 @@ app.post('/delete-user', async (req, res) => {
 // -------------------- PASSWORTRESET --------------------
 
 /**
+ * 1) Reset-Code anfordern
+ * Body: { email }
+ */
+app.post('/request-password-reset', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    if (!email) {
+      return res.status(400).json({ fehler: "E-Mail fehlt." });
+    }
+
+    const userRef = db.collection('users').doc(email);
+    const doc = await userRef.get();
+
+    // Security: keine Info leaken, ob User existiert
+    if (!doc.exists) {
+      return res.status(200).json({ nachricht: "Wenn das Konto existiert, wurde ein Code gesendet." });
+    }
+
+    // 6-stelliger Code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const codeHash = hashToken(code);
+    const expiresAt = admin.firestore.Timestamp.fromDate(new Date(Date.now() + 15 * 60 * 1000)); // 15 min
+
+    await userRef.update({
+      resetCodeHash: codeHash,
+      resetCodeExpiresAt: expiresAt,
+      resetRequestedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await sendResetCode(email, code);
+
+    res.status(200).json({ nachricht: "Wenn das Konto existiert, wurde ein Code gesendet." });
+  } catch (error) {
+    res.status(500).json({ fehler: `Fehler beim Anfordern: ${error.message}` });
+  }
+>>>>>>> Stashed changes
+});
+
+app.post('/delete-user', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    const { password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ fehler: "Daten unvollständig." });
+    }
+
+    const userRef = db.collection('users').doc(email);
+    const doc = await userRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+    }
+
+    const user = doc.data();
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ fehler: "Ungültiges Passwort." });
+    }
+
+    await userRef.delete();
+    res.status(200).json({ nachricht: "Benutzerkonto erfolgreich gelöscht." });
+  } catch (error) {
+    res.status(500).json({ fehler: `Fehler beim Löschen: ${error.message}` });
+  }
+});
+
+// -------------------- PASSWORTRESET --------------------
+
+/**
+<<<<<<< Updated upstream
  * 1) Reset-Code anfordern
  * Body: { email }
  */
@@ -367,11 +457,19 @@ app.post('/delete-user', async (req, res) => {
  * Body: { email, code, newPassword }
  */
 >>>>>>> Stashed changes
+=======
+ * 2) Passwort zurücksetzen
+ * Body: { email, code, newPassword }
+ */
+>>>>>>> Stashed changes
 app.post('/reset-password', async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     const { code, newPassword } = req.body;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     if (!email || !code || !newPassword) {
@@ -416,6 +514,7 @@ app.post('/reset-password', async (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 // ────────────────────────────────────────────────
 // Google-Login-Skizze (noch nicht vollständig implementiert)
@@ -492,6 +591,9 @@ app.post('/google-login', async (req, res) => {
 // Server starten
 // ────────────────────────────────────────────────
 
+=======
+// Server start
+>>>>>>> Stashed changes
 =======
 // Server start
 >>>>>>> Stashed changes
