@@ -33,9 +33,13 @@ export default function LoginScreen({ navigation, onLogin, errorMessage, loading
         onChangeText={setPassword}
         secureTextEntry
       />
-      
-      <TouchableOpacity style={styles.mainButton} onPress={() => onLogin(email, password)} disabled={loading}>
+
+      <TouchableOpacity style={styles.mainButton} onPress={() => onLogin(email.trim(), password)} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Anmelden</Text>}
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={styles.forgotBtn}>
+        <Text style={styles.forgotText}>Passwort vergessen?</Text>
       </TouchableOpacity>
 
       <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
@@ -50,5 +54,7 @@ const styles = StyleSheet.create({
   errorText: { color: '#d32f2f', textAlign: 'center', fontWeight: '500' },
   input: { width: '100%', height: 50, borderColor: '#ddd', borderWidth: 1, borderRadius: 8, paddingHorizontal: 15, marginVertical: 10, backgroundColor: '#fafafa' },
   mainButton: { backgroundColor: '#007AFF', paddingVertical: 15, borderRadius: 10, width: '100%', marginVertical: 20, height: 55, justifyContent: 'center' },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' }
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  forgotBtn: { marginBottom: 15 },
+  forgotText: { color: '#007AFF', textDecorationLine: 'underline' },
 });
