@@ -22,6 +22,8 @@ export default function LoginScreen({ navigation, onLogin, errorMessage, loading
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        accessibilityLabel="E-Mail Adresse Eingabefeld"
+        accessibilityHint="Gib hier deine registrierte E-Mail Adresse ein"
       />
 
       <TextInput
