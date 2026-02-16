@@ -260,7 +260,36 @@ app.post('/reset-password', async (req, res) => {
         res.status(500).json({ fehler: `Fehler beim Zurücksetzen: ${error.message}` });
     }
 });
+app.post('/google-login', async (req, res) => {
+    try {
+        const { idToken } = req.body;
 
+        if (!idToken) {
+            return res.status(400).json({ fehler: "idToken fehlt" });
+        }
+
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const uid = decodedToken.uid;
+
+        const userRef = db.collection('users').doc(uid);
+        await userRef.set({
+            uid: uid,
+            email: decodedToken.email || null,
+            displayName: decodedToken.name || null,
+            photoURL: decodedToken.picture || null,
+            providers: ['google'],
+            lastLogin: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        res.status(200).json({
+            nachricht: "Google-Login erfolgreich",
+            uid: uid,
+            email: decodedToken.email || null
+        });
+    } catch (error) {
+        res.status(401).json({ fehler: "Ungültiger Google-Token", details: error.message });
+    }
+});
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server läuft auf Port ${PORT}`);

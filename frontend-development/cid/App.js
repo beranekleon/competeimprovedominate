@@ -11,6 +11,11 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import TestScreen from './src/screens/TestScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+  webClientId: '228623557792-9dqfernukmrvrf64lt7rb8p7nfphrrd1.apps.googleusercontent.com',  // ← die ID von gerade kopieren!
+});
 
 
 const Stack = createStackNavigator();
