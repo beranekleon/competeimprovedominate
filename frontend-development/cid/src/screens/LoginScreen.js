@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
 
-export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onConfirmPhoneCode, phone, setPhone, code, setCode, confirm, errorMessage, loading }) {
+export default function LoginScreen({
+                                        navigation,
+                                        onLogin,                // E-Mail-Login aus App.js
+                                        onSendPhoneCode,        // Code anfordern
+                                        onConfirmPhoneCode,     // Code bestätigen
+                                        phone,
+                                        setPhone,
+                                        code,
+                                        setCode,
+                                        confirm,
+                                        errorMessage,
+                                        loading
+                                    }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loginMode, setLoginMode] = useState('email'); // 'email' oder 'phone'
@@ -16,7 +28,7 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                 </View>
             )}
 
-            {/* Auswahl-Buttons */}
+            {/* Modus-Auswahl (Tabs) */}
             <View style={styles.modeButtons}>
                 <TouchableOpacity
                     style={[
@@ -49,9 +61,9 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                 </TouchableOpacity>
             </View>
 
-            {/* E-Mail-Bereich – nur sichtbar bei loginMode = 'email' */}
+            {/* E-Mail-Login */}
             {loginMode === 'email' && (
-                <View style={styles.formSection}>
+                <View style={styles.form}>
                     <TextInput
                         style={styles.input}
                         placeholder="E-Mail"
@@ -70,7 +82,7 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                     />
 
                     <TouchableOpacity
-                        style={styles.mainButton}
+                        style={styles.loginButton}
                         onPress={() => onLogin(email.trim(), password)}
                         disabled={loading}
                     >
@@ -83,9 +95,9 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                 </View>
             )}
 
-            {/* Telefon-Bereich – nur sichtbar bei loginMode = 'phone' */}
+            {/* Telefon-Login */}
             {loginMode === 'phone' && (
-                <View style={styles.formSection}>
+                <View style={styles.form}>
                     <TextInput
                         style={styles.input}
                         placeholder="+49123456789"
@@ -96,7 +108,7 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
 
                     {!confirm ? (
                         <TouchableOpacity
-                            style={styles.mainButton}
+                            style={styles.loginButton}
                             onPress={onSendPhoneCode}
                             disabled={loading}
                         >
@@ -118,14 +130,14 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                             />
 
                             <TouchableOpacity
-                                style={styles.mainButton}
+                                style={styles.loginButton}
                                 onPress={onConfirmPhoneCode}
                                 disabled={loading}
                             >
                                 {loading ? (
                                     <ActivityIndicator color="#fff" />
                                 ) : (
-                                    <Text style={styles.buttonText}>Bestätigen</Text>
+                                    <Text style={styles.buttonText}>Code bestätigen</Text>
                                 )}
                             </TouchableOpacity>
                         </>
@@ -133,7 +145,7 @@ export default function LoginScreen({ navigation, onLogin, onSendPhoneCode, onCo
                 </View>
             )}
 
-            {/* Reset-Passwort-Link */}
+            {/* Zusätzliche Links */}
             <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={styles.forgotBtn}>
                 <Text style={styles.forgotText}>Passwort vergessen?</Text>
             </TouchableOpacity>
@@ -152,7 +164,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     title: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 20,
     },
@@ -173,15 +185,16 @@ const styles = StyleSheet.create({
     modeButtons: {
         flexDirection: 'row',
         width: '100%',
-        marginBottom: 20,
-        justifyContent: 'space-between',
+        marginBottom: 25,
+        borderRadius: 10,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#ddd',
     },
     modeButton: {
         flex: 1,
-        paddingVertical: 12,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 8,
-        marginHorizontal: 5,
+        paddingVertical: 14,
+        backgroundColor: '#f8f8f8',
         alignItems: 'center',
     },
     modeButtonActive: {
@@ -189,57 +202,47 @@ const styles = StyleSheet.create({
     },
     modeButtonText: {
         fontSize: 16,
-        color: '#333',
         fontWeight: '600',
+        color: '#555',
     },
     modeButtonTextActive: {
         color: '#fff',
     },
-    formSection: {
+    form: {
         width: '100%',
         alignItems: 'center',
     },
     input: {
         width: '100%',
-        height: 50,
+        height: 52,
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: 10,
         paddingHorizontal: 15,
-        marginVertical: 10,
+        marginVertical: 8,
         backgroundColor: '#fafafa',
+        fontSize: 16,
     },
-    mainButton: {
+    loginButton: {
         backgroundColor: '#007AFF',
         paddingVertical: 15,
         borderRadius: 10,
         width: '100%',
-        marginVertical: 10,
-        height: 55,
-        justifyContent: 'center',
+        marginTop: 15,
+        alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
-        textAlign: 'center',
     },
     forgotBtn: {
-        marginTop: 15,
+        marginTop: 20,
         marginBottom: 10,
     },
     forgotText: {
         color: '#007AFF',
         textDecorationLine: 'underline',
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    phoneSection: {
-        width: '100%',
-        marginTop: 20,
+        fontSize: 16,
     },
 });

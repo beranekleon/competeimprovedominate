@@ -20,6 +20,10 @@ app.post('/login-phone', authController.loginPhone);
 app.post('/save-data', userController.saveData);
 app.post('/delete-user', userController.deleteUser);
 
+
+app.post('/request-phone-code', authController.requestPhoneCode);
+app.post('/verify-phone-code', authController.verifyPhoneCode);
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server läuft auf Port ${PORT}`);
