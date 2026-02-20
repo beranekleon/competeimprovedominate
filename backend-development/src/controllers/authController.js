@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
             email,
             password: hashedPassword,
             phone: phone || null, // neu: Telefonnummer speichern (optional)
-            userData: { workouts: [], progress: {}, lastSync: null },
+            userData: "",
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
