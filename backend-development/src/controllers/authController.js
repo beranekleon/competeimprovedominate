@@ -98,7 +98,7 @@ exports.loginPhone = async (req, res) => {
             nachricht: "Login erfolgreich",
             user: {
                 email: user.email,
-                userData: user.userData || { workouts: [], progress: {} }
+                userData: user.userData
             }
         });
     } catch (error) {
