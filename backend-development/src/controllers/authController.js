@@ -49,7 +49,7 @@ exports.login = async (req, res) => {
 
         res.status(200).json({
             nachricht: "Login erfolgreich.",
-            user: { email: user.email, userData: user.userData || { workouts: [], progress: {} } }
+            user: { email: user.email, userData: user.userData }
         });
     } catch (error) {
         res.status(500).json({ fehler: error.message });
@@ -182,7 +182,7 @@ exports.verifyPhoneCode = async (req, res) => {
             nachricht: "Login erfolgreich",
             user: {
                 email: user.email,
-                userData: user.userData || { workouts: [], progress: {} }
+                userData: user.userData
             }
         });
     } catch (error) {
