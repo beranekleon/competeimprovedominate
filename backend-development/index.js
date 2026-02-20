@@ -290,6 +290,29 @@ app.post('/google-login', async (req, res) => {
         res.status(401).json({ fehler: "Ungültiger Google-Token", details: error.message });
     }
 });
+app.post('/auth-verify', async (req, res) => {
+    const { idToken } = req.body;
+    if (!idToken) {
+        return res.status(400).json({ fehler: "idToken fehlt" });
+    }
+
+    try {
+        const decoded = await admin.auth().verifyIdToken(idToken);
+        const uid = decoded.uid;
+        const userRef = db.collection('users').doc(uid);
+        await userRef.set({
+            uid: uid,
+            email: decoded.email || null,
+            phoneNumber: decoded.phone_number || null,
+            userData: { workouts: [], progress: {} }, // Standard-Daten
+            lastLogin: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        res.status(200).json({ nachricht: "Login erfolgreich", user: { userData: userRef.data().userData } });
+    } catch (error) {
+        res.status(401).json({ fehler: "Ungültiger Token" });
+    }
+});
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server läuft auf Port ${PORT}`);

@@ -11,12 +11,6 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import TestScreen from './src/screens/TestScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-GoogleSignin.configure({
-  webClientId: '228623557792-9dqfernukmrvrf64lt7rb8p7nfphrrd1.apps.googleusercontent.com',  // ← die ID von gerade kopieren!
-});
-
 
 const Stack = createStackNavigator();
 
@@ -26,12 +20,12 @@ export default function App() {
   const [userEmail, setUserEmail] = useState('');
   const [userText, setUserText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null); 
+  const [data, setData] = useState(null);
   const [loginError, setLoginError] = useState(null);
 
   const API_URL = BACKEND_URL;
 
-  // 1. Sitzung beim App-Start wiederherstellen
+  // Sitzung beim App-Start wiederherstellen
   useEffect(() => {
     const loadInitialState = async () => {
       try {
@@ -53,7 +47,7 @@ export default function App() {
     loadInitialState();
   }, []);
 
-  // 2. Verbindungstest
+  // Verbindungstest
   const testConnection = async () => {
     setLoading(true);
     try {
@@ -67,7 +61,7 @@ export default function App() {
     }
   };
 
-  // 3. Login
+  // Login (dein altes Backend-Login)
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);
@@ -83,7 +77,6 @@ export default function App() {
         await AsyncStorage.setItem('@is_logged_in', 'true');
         await AsyncStorage.setItem('@user_email', email);
         await AsyncStorage.setItem('@user_text', JSON.stringify(json.user.userData) || '');
-        
         setUserEmail(email);
         setUserText(typeof json.user.userData === 'object' ? JSON.stringify(json.user.userData) : json.user.userData);
         setIsLoggedIn(true);
@@ -97,7 +90,7 @@ export default function App() {
     }
   };
 
-  // 4. Logout (mit Cloud-Sync)
+  // Logout (mit Cloud-Sync)
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -119,7 +112,7 @@ export default function App() {
     }
   };
 
-  // 5. NEU: Account löschen Logik
+  // Account löschen
   const handleDeleteAccount = async (password) => {
     setLoading(true);
     try {
@@ -149,37 +142,41 @@ export default function App() {
   if (!isAppReady) return null;
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          <Stack.Screen name="Dashboard">
-            {(props) => (
-              <TestScreen 
-                {...props} 
-                userText={userText} 
-                setUserText={setUserText} 
-                onLogout={handleLogout} 
-                onTest={testConnection}
-                onDeleteAccount={handleDeleteAccount} // Hier wird die Funktion übergeben
-                data={data}
-                loading={loading}
-              />
-            )}
-          </Stack.Screen>
-        ) : (
-         <>
-                 <Stack.Screen name="Home" component={HomeScreen} />
-                 <Stack.Screen name="Login">
-                 {(props) => (
-                  <LoginScreen {...props} onLogin={handleLogin} errorMessage={loginError} loading={loading} />
-              )}
-                  </Stack.Screen>
-                  <Stack.Screen name="Register" component={RegisterScreen} />
-             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        </>
-
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isLoggedIn ? (
+              <Stack.Screen name="Dashboard">
+                {(props) => (
+                    <TestScreen
+                        {...props}
+                        userText={userText}
+                        setUserText={setUserText}
+                        onLogout={handleLogout}
+                        onTest={testConnection}
+                        onDeleteAccount={handleDeleteAccount}
+                        data={data}
+                        loading={loading}
+                    />
+                )}
+              </Stack.Screen>
+          ) : (
+              <>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Login">
+                  {(props) => (
+                      <LoginScreen
+                          {...props}
+                          onLogin={handleLogin}
+                          errorMessage={loginError}
+                          loading={loading}
+                      />
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="Register" component={RegisterScreen} />
+                <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+              </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
