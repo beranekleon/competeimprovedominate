@@ -61,7 +61,7 @@ export default function App() {
     }
   };
 
-  // Login (dein altes Backend-Login)
+  // Login (Backend-Login)
   const handleLogin = async (email, password) => {
     setLoading(true);
     setLoginError(null);

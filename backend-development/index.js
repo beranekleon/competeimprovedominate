@@ -14,6 +14,7 @@ app.get('/status', (req, res) => res.json({ nachricht: "Backend online!" }));
 app.post('/register', authController.register);
 app.post('/login', authController.login);
 app.post('/google-login', authController.googleLogin);
+app.post('/login-phone', authController.loginPhone);
 
 // User/Data Routen
 app.post('/save-data', userController.saveData);
