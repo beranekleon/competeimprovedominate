@@ -9,7 +9,7 @@ exports.saveData = async (req, res) => {
         const userRef = db.collection('users').doc(email);
         
         await userRef.update({
-            userData: userData ?? { workouts: [], progress: {} },
+            userData: userData ?? "",
             lastUpdate: admin.firestore.FieldValue.serverTimestamp()
         });
         res.status(200).json({ nachricht: "Daten synchronisiert." });
