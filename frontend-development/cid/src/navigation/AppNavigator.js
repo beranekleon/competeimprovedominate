@@ -1,0 +1,44 @@
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useAuth } from '../hooks/useAuth';
+
+// Screens
+import HomeScreen from '../screens/HomeScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+
+const Stack = createStackNavigator();
+
+/**
+ * AppNavigator
+ * Handles all routing - authenticated vs unauthenticated flows
+ */
+export function AppNavigator() {
+  const { isLoggedIn, isAppReady } = useAuth();
+
+  // Don't render until auth state is restored
+  if (!isAppReady) return null;
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? (
+          // Authenticated Flow
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        ) : (
+          // Unauthenticated Flow
+          <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
