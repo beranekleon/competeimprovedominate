@@ -8,15 +8,15 @@ app.use(cors());
 app.use(express.json());
 
 // Status
-app.get('/status', (req, res) => res.json({ nachricht: "Backend online!" }));
+app.get('/status', (req, res) => res.json({ message: "Backend online!" }));
 
-// Auth Routen
+// Auth Routing
 app.post('/register', authController.register);
 app.post('/login', authController.login);
 app.post('/google-login', authController.googleLogin);
 app.post('/login-phone', authController.loginPhone);
 
-// User/Data Routen
+// User/Data Routing
 app.post('/save-data', userController.saveData);
 app.post('/delete-user', userController.deleteUser);
 
