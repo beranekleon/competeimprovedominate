@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
         await userRef.set({
             email,
             password: hashedPassword,
-            phone: phone || null, // neu: Telefonnummer speichern (optional)
+            phone: phone || null, //store phone number (optional)
             userData: "",
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
@@ -83,7 +83,7 @@ exports.loginPhone = async (req, res) => {
 
         const normalizedPhone = phone.trim();
 
-        // Suche User nach Telefonnummer
+        // Search for user by phone number
         const usersRef = db.collection('users');
         const snapshot = await usersRef.where('phone', '==', normalizedPhone).limit(1).get();
 
@@ -112,7 +112,7 @@ exports.requestPhoneCode = async (req, res) => {
 
         const normalizedPhone = phone.trim();
 
-        // Suche User nach Telefonnummer
+        // Search for user by phone number
         const snapshot = await db.collection('users').where('phone', '==', normalizedPhone).limit(1).get();
 
         if (snapshot.empty) {
@@ -122,10 +122,10 @@ exports.requestPhoneCode = async (req, res) => {
         const userDoc = snapshot.docs[0];
         const user = userDoc.data();
 
-        // Generiere Dummy-Code (fest oder random)
-        const code = "123456"; // Oder: Math.floor(100000 + Math.random() * 900000).toString();
+        // Generate dummy code (fixed or random)
+        const code = "123456"; // Or: Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Temporär speichern (z. B. 5 Min Ablauf)
+        // Store temporarily (e.g. 5 min expiration)
         await db.collection('phoneCodes').doc(normalizedPhone).set({
             code,
             userEmail: user.email,
@@ -167,7 +167,7 @@ exports.verifyPhoneCode = async (req, res) => {
             return res.status(400).json({ fehler: "Ungültiger Code" });
         }
 
-        // Code gültig → User-Daten holen
+        // Code valid → fetch user data
         const userSnapshot = await db.collection('users').where('phone', '==', normalizedPhone).limit(1).get();
         if (userSnapshot.empty) {
             return res.status(404).json({ fehler: "User nicht gefunden" });
