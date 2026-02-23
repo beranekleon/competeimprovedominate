@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -10,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
+import { CommonStyles } from '../styles';
 
 /**
  * RegisterScreen
@@ -39,11 +39,11 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Registrierung</Text>
+    <View style={CommonStyles.screenContainer}>
+      <Text style={CommonStyles.screenTitle}>Registrierung</Text>
 
       <TextInput
-        style={styles.input}
+        style={CommonStyles.input}
         placeholder="E-Mail"
         value={email}
         onChangeText={setEmail}
@@ -53,7 +53,7 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={CommonStyles.input}
         placeholder="Passwort"
         value={password}
         onChangeText={setPassword}
@@ -62,7 +62,7 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TextInput
-        style={styles.input}
+        style={CommonStyles.input}
         placeholder="Telefonnummer (optional, z.B. +49123456789)"
         value={phone}
         onChangeText={setPhone}
@@ -71,14 +71,14 @@ export default function RegisterScreen({ navigation }) {
       />
 
       <TouchableOpacity
-        style={styles.mainButton}
+        style={CommonStyles.buttonPrimary}
         onPress={handleRegister}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Konto erstellen</Text>
+          <Text style={CommonStyles.buttonText}>Konto erstellen</Text>
         )}
       </TouchableOpacity>
 
@@ -86,39 +86,3 @@ export default function RegisterScreen({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: { fontSize: 26, fontWeight: 'bold', marginBottom: 20 },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginVertical: 10,
-    backgroundColor: '#fafafa',
-  },
-  mainButton: {
-    backgroundColor: '#34C759',
-    paddingVertical: 15,
-    borderRadius: 10,
-    width: '100%',
-    marginVertical: 20,
-    height: 55,
-    justifyContent: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-});

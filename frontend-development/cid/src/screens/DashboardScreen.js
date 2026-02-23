@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
@@ -11,10 +10,12 @@ import {
   ScrollView,
   Modal,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useAuth } from '../hooks/useAuth';
 import { useGPS } from '../hooks/useGPS';
+import { CommonStyles, Colors } from '../styles';
 
 /**
  * DashboardScreen (formerly TestScreen)
@@ -63,39 +64,39 @@ export default function DashboardScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={CommonStyles.containerWithBackground}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Dashboard</Text>
+      <ScrollView contentContainerStyle={CommonStyles.scrollContainer}>
+        <Text style={CommonStyles.screenTitle}>Dashboard</Text>
 
         {/* Map Display */}
-        <View style={styles.mapContainer}>
+        <View style={CommonStyles.mapContainer}>
           {region ? (
-            <MapView style={styles.map} region={region} showsUserLocation={true}>
+            <MapView style={CommonStyles.map} region={region} showsUserLocation={true}>
               {location && <Marker coordinate={location} title="Deine Position" />}
             </MapView>
           ) : (
-            <View style={styles.mapPlaceholder}>
-              <ActivityIndicator size="large" color="#007AFF" />
+            <View style={CommonStyles.mapPlaceholder}>
+              <ActivityIndicator size="large" color={Colors.primary} />
               <Text style={{ marginTop: 10 }}>GPS wird gesucht...</Text>
-              {errorMsg && <Text style={{ color: 'red' }}>{errorMsg}</Text>}
+              {errorMsg && <Text style={{ color: Colors.error }}>{errorMsg}</Text>}
             </View>
           )}
         </View>
 
         {/* Status Message */}
-        <View style={styles.messageBox}>
+        <View style={CommonStyles.messageBox}>
           {loading ? (
-            <ActivityIndicator color="#007AFF" />
+            <ActivityIndicator color={Colors.primary} />
           ) : (
-            <Text style={styles.messageText}>{statusMessage || 'System online'}</Text>
+            <Text style={CommonStyles.messageText}>{statusMessage || 'System online'}</Text>
           )}
         </View>
 
         {/* Cloud Notes */}
-        <Text style={styles.label}>Cloud-Notizen:</Text>
+        <Text style={CommonStyles.label}>Cloud-Notizen:</Text>
         <TextInput
-          style={styles.input}
+          style={CommonStyles.multilineInput}
           value={userData}
           onChangeText={setUserData}
           multiline
@@ -104,35 +105,39 @@ export default function DashboardScreen() {
 
         {/* Test Connection Button */}
         <TouchableOpacity
-          style={styles.testButton}
+          style={[CommonStyles.buttonSecondary, styles.testButton]}
           onPress={handleTestConnection}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>Verbindung testen</Text>
+          <Text style={CommonStyles.buttonText}>Verbindung testen</Text>
         </TouchableOpacity>
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} disabled={loading}>
-          <Text style={styles.buttonText}>Logout & Speichern</Text>
+        <TouchableOpacity
+          style={[CommonStyles.buttonSecondary, styles.logoutButton]}
+          onPress={handleLogout}
+          disabled={loading}
+        >
+          <Text style={CommonStyles.buttonText}>Logout & Speichern</Text>
         </TouchableOpacity>
 
         {/* Delete Account Button */}
         <TouchableOpacity
-          style={styles.deleteAccountButton}
+          style={CommonStyles.deleteAccountButton}
           onPress={() => setDeleteModalVisible(true)}
           disabled={loading}
         >
-          <Text style={styles.deleteButtonText}>Konto unwiderruflich löschen</Text>
+          <Text style={CommonStyles.deleteButtonText}>Konto unwiderruflich löschen</Text>
         </TouchableOpacity>
 
         {/* Delete Confirmation Modal */}
         <Modal visible={deleteModalVisible} transparent animationType="fade">
-          <View style={styles.modalBackdrop}>
-            <View style={styles.modalCard}>
-              <Text style={styles.modalTitle}>Konto löschen</Text>
+          <View style={CommonStyles.modalBackdrop}>
+            <View style={CommonStyles.modalCard}>
+              <Text style={CommonStyles.modalTitle}>Konto löschen</Text>
               <Text>Bitte Passwort zur Bestätigung eingeben:</Text>
               <TextInput
-                style={styles.modalInput}
+                style={CommonStyles.modalInput}
                 secureTextEntry
                 value={deletePassword}
                 onChangeText={setDeletePassword}
@@ -146,13 +151,13 @@ export default function DashboardScreen() {
                   }}
                   disabled={loading}
                 >
-                  <Text style={{ color: 'gray' }}>Abbrechen</Text>
+                  <Text style={{ color: Colors.textGray }}>Abbrechen</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleDeleteConfirm} disabled={loading}>
                   {loading ? (
-                    <ActivityIndicator color="red" />
+                    <ActivityIndicator color={Colors.red} />
                   ) : (
-                    <Text style={{ color: 'red', fontWeight: 'bold' }}>Löschen</Text>
+                    <Text style={{ color: Colors.red, fontWeight: 'bold' }}>Löschen</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -164,50 +169,12 @@ export default function DashboardScreen() {
   );
 }
 
+// Screen-specific button color variants
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fa' },
-  scrollContainer: { alignItems: 'center', padding: 20, paddingTop: 60 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  mapContainer: {
-    width: '100%',
-    height: 250,
-    borderRadius: 15,
-    overflow: 'hidden',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
+  testButton: { 
+    backgroundColor: Colors.purple,
   },
-  map: { width: '100%', height: '100%' },
-  mapPlaceholder: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#eee' },
-  messageBox: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
+  logoutButton: { 
+    backgroundColor: Colors.neutral,
   },
-  messageText: { color: '#007AFF', fontWeight: 'bold' },
-  label: { alignSelf: 'flex-start', marginBottom: 5, fontWeight: '600' },
-  input: {
-    width: '100%',
-    height: 80,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    textAlignVertical: 'top',
-  },
-  testButton: { backgroundColor: '#5856D6', paddingVertical: 12, borderRadius: 10, width: '100%', marginTop: 20 },
-  logoutButton: { backgroundColor: '#8E8E93', paddingVertical: 12, borderRadius: 10, width: '100%', marginTop: 10 },
-  deleteAccountButton: { marginTop: 30, padding: 10 },
-  deleteButtonText: { color: 'red', textAlign: 'center', textDecorationLine: 'underline' },
-  buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalCard: { width: '80%', backgroundColor: '#fff', padding: 20, borderRadius: 15 },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  modalInput: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginVertical: 15 },
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, Button } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, Button } from 'react-native';
 import { BACKEND_URL } from '@env';
+import { CommonStyles, Colors } from '../styles';
 
 export default function ResetPasswordScreen({ navigation }) {
   const [step, setStep] = useState(1); // 1 = Code anfordern, 2 = Passwort setzen
@@ -61,11 +62,11 @@ export default function ResetPasswordScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Passwort zurücksetzen</Text>
+    <View style={CommonStyles.screenContainer}>
+      <Text style={CommonStyles.title}>Passwort zurücksetzen</Text>
 
       <TextInput
-        style={styles.input}
+        style={CommonStyles.input}
         placeholder="E-Mail"
         value={email}
         onChangeText={setEmail}
@@ -75,34 +76,34 @@ export default function ResetPasswordScreen({ navigation }) {
 
       {step === 1 ? (
         <>
-          <TouchableOpacity style={styles.mainButton} onPress={requestCode} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Code anfordern</Text>}
+          <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={requestCode} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={CommonStyles.buttonText}>Code anfordern</Text>}
           </TouchableOpacity>
           <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
         </>
       ) : (
         <>
           <TextInput
-            style={styles.input}
+            style={CommonStyles.input}
             placeholder="6-stelliger Code"
             value={code}
             onChangeText={setCode}
             keyboardType="number-pad"
           />
           <TextInput
-            style={styles.input}
+            style={CommonStyles.input}
             placeholder="Neues Passwort (min. 8 Zeichen)"
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
           />
 
-          <TouchableOpacity style={styles.mainButton} onPress={resetPassword} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Passwort setzen</Text>}
+          <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={resetPassword} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={CommonStyles.buttonText}>Passwort setzen</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setStep(1)} style={{ marginTop: 10 }}>
-            <Text style={{ color: '#007AFF' }}>Neuen Code anfordern</Text>
+          <TouchableOpacity onPress={() => setStep(1)} style={CommonStyles.forgotBtn}>
+            <Text style={CommonStyles.linkText}>Neuen Code anfordern</Text>
           </TouchableOpacity>
 
           <View style={{ marginTop: 20, width: '100%' }}>
@@ -113,11 +114,3 @@ export default function ResetPasswordScreen({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  input: { width: '100%', height: 50, borderColor: '#ddd', borderWidth: 1, borderRadius: 8, paddingHorizontal: 15, marginVertical: 10, backgroundColor: '#fafafa' },
-  mainButton: { backgroundColor: '#007AFF', paddingVertical: 15, borderRadius: 10, width: '100%', marginVertical: 20, height: 55, justifyContent: 'center' },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
-});
