@@ -2,179 +2,76 @@ import React, { useState } from 'react';
 import {
   Text,
   View,
-  TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Modal,
-  Alert,
   StyleSheet,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useAuth } from '../hooks/useAuth';
 import { useGPS } from '../hooks/useGPS';
 import { CommonStyles, Colors } from '../styles';
+import TaskBar from '../components/TaskBar';
 
 /**
- * DashboardScreen (formerly TestScreen)
- * Main user dashboard with map, cloud notes, and account management
+ * DashboardScreen
+ * Main user dashboard with map and taskbar
  */
-export default function DashboardScreen() {
-  const { userData, setUserData, logout, deleteAccount, testConnection, loading } = useAuth();
+export default function DashboardScreen({ navigation }) {
+  const { loading } = useAuth();
   const { location, errorMsg, region, isLoading: gpsLoading } = useGPS();
-  const [statusMessage, setStatusMessage] = useState(null);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
+  const [isRunning, setIsRunning] = useState(false);
 
-  const handleTestConnection = async () => {
-    try {
-      const result = await testConnection();
-      setStatusMessage(result);
-    } catch (error) {
-      setStatusMessage('Verbindungsfehler');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      Alert.alert('Fehler', error.message || 'Logout fehlgeschlagen');
-    }
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deletePassword.trim()) {
-      Alert.alert('Fehler', 'Bitte Passwort eingeben');
-      return;
-    }
-
-    try {
-      await deleteAccount(deletePassword);
-      setDeleteModalVisible(false);
-      Alert.alert('Erfolg', 'Konto erfolgreich gelöscht.');
-    } catch (error) {
-      Alert.alert('Fehler', error.message || 'Fehler beim Löschen');
-      setDeletePassword('');
-    }
+  const handleStartStop = () => {
+    setIsRunning(!isRunning);
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={CommonStyles.containerWithBackground}
-    >
-      <ScrollView contentContainerStyle={CommonStyles.scrollContainer}>
-        <Text style={CommonStyles.screenTitle}>Dashboard</Text>
-
-        {/* Map Display */}
-        <View style={CommonStyles.mapContainer}>
-          {region ? (
-            <MapView style={CommonStyles.map} region={region} showsUserLocation={true}>
-              {location && <Marker coordinate={location} title="Deine Position" />}
-            </MapView>
-          ) : (
-            <View style={CommonStyles.mapPlaceholder}>
-              <ActivityIndicator size="large" color={Colors.primary} />
-              <Text style={{ marginTop: 10 }}>GPS wird gesucht...</Text>
-              {errorMsg && <Text style={{ color: Colors.error }}>{errorMsg}</Text>}
-            </View>
-          )}
-        </View>
-
-        {/* Status Message */}
-        <View style={CommonStyles.messageBox}>
-          {loading ? (
-            <ActivityIndicator color={Colors.primary} />
-          ) : (
-            <Text style={CommonStyles.messageText}>{statusMessage || 'System online'}</Text>
-          )}
-        </View>
-
-        {/* Cloud Notes */}
-        <Text style={CommonStyles.label}>Cloud-Notizen:</Text>
-        <TextInput
-          style={CommonStyles.multilineInput}
-          value={userData}
-          onChangeText={setUserData}
-          multiline
-          editable={!loading}
-        />
-
-        {/* Test Connection Button */}
-        <TouchableOpacity
-          style={[CommonStyles.buttonSecondary, styles.testButton]}
-          onPress={handleTestConnection}
-          disabled={loading}
-        >
-          <Text style={CommonStyles.buttonText}>Verbindung testen</Text>
-        </TouchableOpacity>
-
-        {/* Logout Button */}
-        <TouchableOpacity
-          style={[CommonStyles.buttonSecondary, styles.logoutButton]}
-          onPress={handleLogout}
-          disabled={loading}
-        >
-          <Text style={CommonStyles.buttonText}>Logout & Speichern</Text>
-        </TouchableOpacity>
-
-        {/* Delete Account Button */}
-        <TouchableOpacity
-          style={CommonStyles.deleteAccountButton}
-          onPress={() => setDeleteModalVisible(true)}
-          disabled={loading}
-        >
-          <Text style={CommonStyles.deleteButtonText}>Konto unwiderruflich löschen</Text>
-        </TouchableOpacity>
-
-        {/* Delete Confirmation Modal */}
-        <Modal visible={deleteModalVisible} transparent animationType="fade">
-          <View style={CommonStyles.modalBackdrop}>
-            <View style={CommonStyles.modalCard}>
-              <Text style={CommonStyles.modalTitle}>Konto löschen</Text>
-              <Text>Bitte Passwort zur Bestätigung eingeben:</Text>
-              <TextInput
-                style={CommonStyles.modalInput}
-                secureTextEntry
-                value={deletePassword}
-                onChangeText={setDeletePassword}
-                editable={!loading}
-              />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setDeleteModalVisible(false);
-                    setDeletePassword('');
-                  }}
-                  disabled={loading}
-                >
-                  <Text style={{ color: Colors.textGray }}>Abbrechen</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleDeleteConfirm} disabled={loading}>
-                  {loading ? (
-                    <ActivityIndicator color={Colors.red} />
-                  ) : (
-                    <Text style={{ color: Colors.red, fontWeight: 'bold' }}>Löschen</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
+    <View style={styles.container}>
+      {/* Full Screen Map */}
+      <View style={styles.mapContainer}>
+        {region ? (
+          <MapView style={styles.map} region={region} showsUserLocation={true}>
+            {location && <Marker coordinate={location} title="Deine Position" />}
+          </MapView>
+        ) : (
+          <View style={styles.mapPlaceholder}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+            <Text style={{ marginTop: 10 }}>GPS wird gesucht...</Text>
+            {errorMsg && <Text style={{ color: Colors.error }}>{errorMsg}</Text>}
           </View>
-        </Modal>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        )}
+      </View>
+
+      {/* Bottom Taskbar */}
+      <TaskBar
+        onCenterPress={handleStartStop}
+        centerButtonText={isRunning ? 'Stop' : 'Start'}
+        centerButtonActive={isRunning}
+        onRightPress={() => navigation.navigate('Profile')}
+        rightButtonVisible={true}
+        loading={loading}
+      />
+    </View>
   );
 }
 
-// Screen-specific button color variants
+// Screen-specific styles
 const styles = StyleSheet.create({
-  testButton: { 
-    backgroundColor: Colors.purple,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  logoutButton: { 
-    backgroundColor: Colors.neutral,
+  mapContainer: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  map: {
+    flex: 1,
+  },
+  mapPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.lightGray,
   },
 });

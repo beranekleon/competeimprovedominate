@@ -10,8 +10,22 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createStackNavigator();
+
+/**
+ * AuthenticatedNavigator
+ * Stack navigator for authenticated user flow
+ */
+function AuthenticatedNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Dashboard" component={DashboardScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+    </Stack.Navigator>
+  );
+}
 
 /**
  * AppNavigator
@@ -28,7 +42,7 @@ export function AppNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isLoggedIn ? (
           // Authenticated Flow
-          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="AuthFlow" component={AuthenticatedNavigator} />
         ) : (
           // Unauthenticated Flow
           <>
