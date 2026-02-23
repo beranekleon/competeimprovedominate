@@ -17,6 +17,7 @@ import { useAuth } from '../hooks/useAuth';
  */
 export default function RegisterScreen({ navigation }) {
   const { register, loading } = useAuth();
+  const { login } = useAuth(); // For automatic login after registration
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
@@ -27,15 +28,11 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    if (password.length < 8) {
-      Alert.alert('Fehler', 'Passwort muss mindestens 8 Zeichen haben');
-      return;
-    }
-
     try {
       await register(email, password, phone || null);
-      Alert.alert('Erfolg', 'Konto erstellt! Du kannst dich jetzt einloggen.');
-      navigation.navigate('Login');
+      // Automatically log in the user
+      await login(email, password);
+      // Navigation will automatically happen via AppNavigator based on isLoggedIn state
     } catch (error) {
       Alert.alert('Fehler', error.message || 'Registrierung fehlgeschlagen');
     }
@@ -57,7 +54,7 @@ export default function RegisterScreen({ navigation }) {
 
       <TextInput
         style={styles.input}
-        placeholder="Passwort (min. 8 Zeichen)"
+        placeholder="Passwort"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
