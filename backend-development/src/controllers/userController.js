@@ -18,6 +18,43 @@ exports.saveData = async (req, res) => {
     }
 };
 
+exports.saveSession = async (req, res) => {
+    try {
+        const email = normalizeEmail(req.body.email);
+        const { session } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ fehler: "E-Mail fehlt." });
+        }
+
+        if (!session || !session.startedAt || !session.stoppedAt || typeof session.durationMs !== 'number') {
+            return res.status(400).json({ fehler: "Ungültige Session-Daten." });
+        }
+
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        await userRef.update({
+            sessions: admin.firestore.FieldValue.arrayUnion({
+                startedAt: session.startedAt,
+                stoppedAt: session.stoppedAt,
+                durationMs: session.durationMs,
+                durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
+                savedAt: admin.firestore.FieldValue.serverTimestamp(),
+            }),
+            lastUpdate: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.status(200).json({ nachricht: "Session gespeichert." });
+    } catch (error) {
+        res.status(500).json({ fehler: error.message });
+    }
+};
+
 exports.deleteUser = async (req, res) => {
     try {
         const email = normalizeEmail(req.body.email);

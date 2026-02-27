@@ -19,6 +19,19 @@ const userService = {
   },
 
   /**
+   * Save a recording session (start/stop and duration)
+   * @param {string} email - User email
+   * @param {{startedAt: string, stoppedAt: string, durationMs: number, durationSeconds?: number}} session
+   * @returns {Promise<object>} Success message
+   */
+  saveSession: async (email, session) => {
+    return api.post('/save-session', {
+      email,
+      session,
+    });
+  },
+
+  /**
    * Test connection to backend
    * @returns {Promise<object>} Status message from server
    */

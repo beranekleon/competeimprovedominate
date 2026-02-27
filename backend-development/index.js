@@ -18,6 +18,7 @@ app.post('/login-phone', authController.loginPhone);
 
 // User/Data Routing
 app.post('/save-data', userController.saveData);
+app.post('/save-session', userController.saveSession);
 app.post('/delete-user', userController.deleteUser);
 
 
