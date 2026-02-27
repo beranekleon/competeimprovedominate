@@ -7,10 +7,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { useAuth } from '../hooks/useAuth';
-import { useGPS } from '../hooks/useGPS';
-import { CommonStyles, Colors } from '../styles';
-import TaskBar from '../components/TaskBar';
+import { useAuth } from '../../hooks/useAuth';
+import { useGPS } from '../../hooks/useGPS';
+import { CommonStyles, Colors } from '../../styles';
+import TaskBar from '../../components/TaskBar';
 
 /**
  * DashboardScreen

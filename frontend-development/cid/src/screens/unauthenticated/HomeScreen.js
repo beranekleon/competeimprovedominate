@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
-import { CommonStyles, Colors } from '../styles';
+import { CommonStyles, Colors } from '../../styles';
 
 /**
  * HomeScreen
@@ -9,7 +9,7 @@ import { CommonStyles, Colors } from '../styles';
 export default function HomeScreen({ navigation }) {
   return (
     <View style={CommonStyles.screenContainer}>
-      <Image source={require('../../assets/icon.png')} style={CommonStyles.logo} />
+      <Image source={require('../../../assets/icon.png')} style={CommonStyles.logo} />
       <Text style={CommonStyles.welcomeText}>Willkommen bei Territory Conqueror</Text>
 
       <TouchableOpacity

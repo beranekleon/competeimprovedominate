@@ -5,12 +5,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../hooks/useAuth';
 
 // Screens
-import HomeScreen from '../screens/HomeScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ResetPasswordScreen from '../screens/ResetPasswordScreen';
-import DashboardScreen from '../screens/DashboardScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import HomeScreen from '../screens/unauthenticated/HomeScreen';
+import LoginScreen from '../screens/unauthenticated/LoginScreen';
+import RegisterScreen from '../screens/unauthenticated/RegisterScreen';
+import ResetPasswordScreen from '../screens/unauthenticated/ResetPasswordScreen';
+import DashboardScreen from '../screens/authenticated/DashboardScreen';
+import ProfileScreen from '../screens/authenticated/ProfileScreen';
 
 const Stack = createStackNavigator();
 

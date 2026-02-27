@@ -11,9 +11,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuth } from '../hooks/useAuth';
-import { CommonStyles, Colors } from '../styles';
-import TaskBar from '../components/TaskBar';
+import { useAuth } from '../../hooks/useAuth';
+import { CommonStyles, Colors } from '../../styles';
+import TaskBar from '../../components/TaskBar';
 
 /**
  * ProfileScreen

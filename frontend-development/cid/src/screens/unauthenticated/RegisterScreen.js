@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useAuth } from '../hooks/useAuth';
-import { CommonStyles } from '../styles';
+import { useAuth } from '../../hooks/useAuth';
+import { CommonStyles } from '../../styles';
 
 /**
  * RegisterScreen

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, Button } from 'react-native';
 import { BACKEND_URL } from '@env';
-import { CommonStyles, Colors } from '../styles';
+import { CommonStyles, Colors } from '../../styles';
 
 export default function ResetPasswordScreen({ navigation }) {
   const [step, setStep] = useState(1); // 1 = Code anfordern, 2 = Passwort setzen
