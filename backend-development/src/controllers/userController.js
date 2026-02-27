@@ -44,7 +44,7 @@ exports.saveSession = async (req, res) => {
                 stoppedAt: session.stoppedAt,
                 durationMs: session.durationMs,
                 durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
-                savedAt: admin.firestore.FieldValue.serverTimestamp(),
+                savedAt: admin.firestore.Timestamp.now(),
             }),
             lastUpdate: admin.firestore.FieldValue.serverTimestamp()
         });
