@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Text,
   View,
-  TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   Alert,
@@ -24,9 +23,45 @@ export default function DashboardScreen({ navigation }) {
   const [isRunning, setIsRunning] = useState(false);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [recordingLoading, setRecordingLoading] = useState(false);
+  const gpsTrackRef = useRef([]);
+  const latestLocationRef = useRef(null);
+
+  useEffect(() => {
+    latestLocationRef.current = location || null;
+  }, [location]);
+
+  useEffect(() => {
+    if (!isRunning) {
+      return;
+    }
+
+    const pushCurrentLocation = () => {
+      const current = latestLocationRef.current;
+      if (!current || typeof current.latitude !== 'number' || typeof current.longitude !== 'number') {
+        return;
+      }
+
+      const sample = {
+        latitude: current.latitude,
+        longitude: current.longitude,
+        accuracy: typeof current.accuracy === 'number' ? current.accuracy : null,
+        speed: typeof current.speed === 'number' ? current.speed : null,
+        heading: typeof current.heading === 'number' ? current.heading : null,
+        timestamp: new Date().toISOString(),
+      };
+
+      gpsTrackRef.current.push(sample);
+    };
+
+    pushCurrentLocation();
+    const intervalId = setInterval(pushCurrentLocation, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [isRunning]);
 
   const handleStartStop = async () => {
     if (!isRunning) {
+      gpsTrackRef.current = [];
       setSessionStartTime(Date.now());
       setIsRunning(true);
       return;
@@ -44,6 +79,7 @@ export default function DashboardScreen({ navigation }) {
       stoppedAt: new Date(stopTime).toISOString(),
       durationMs,
       durationSeconds: Math.floor(durationMs / 1000),
+      locations: gpsTrackRef.current,
     };
 
     try {
@@ -51,6 +87,7 @@ export default function DashboardScreen({ navigation }) {
       await userService.saveSession(userEmail, session);
       setIsRunning(false);
       setSessionStartTime(null);
+      gpsTrackRef.current = [];
     } catch (error) {
       Alert.alert('Fehler', error.message || 'Session konnte nicht gespeichert werden.');
     } finally {

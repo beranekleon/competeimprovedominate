@@ -31,6 +31,18 @@ exports.saveSession = async (req, res) => {
             return res.status(400).json({ fehler: "Ungültige Session-Daten." });
         }
 
+        const rawLocations = Array.isArray(session.locations) ? session.locations : [];
+        const locations = rawLocations
+            .filter((point) => point && typeof point.latitude === 'number' && typeof point.longitude === 'number')
+            .map((point) => ({
+                latitude: point.latitude,
+                longitude: point.longitude,
+                accuracy: typeof point.accuracy === 'number' ? point.accuracy : null,
+                speed: typeof point.speed === 'number' ? point.speed : null,
+                heading: typeof point.heading === 'number' ? point.heading : null,
+                timestamp: point.timestamp || new Date().toISOString(),
+            }));
+
         const userRef = db.collection('users').doc(email);
         const doc = await userRef.get();
 
@@ -44,6 +56,7 @@ exports.saveSession = async (req, res) => {
                 stoppedAt: session.stoppedAt,
                 durationMs: session.durationMs,
                 durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
+                locations,
                 savedAt: admin.firestore.Timestamp.now(),
             }),
             lastUpdate: admin.firestore.FieldValue.serverTimestamp()
