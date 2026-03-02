@@ -16,14 +16,16 @@ app.post('/login', authController.login);
 app.post('/google-login', authController.googleLogin);
 app.post('/login-phone', authController.loginPhone);
 
+app.post('/request-phone-code', authController.requestPhoneCode);
+app.post('/verify-phone-code', authController.verifyPhoneCode);
+
+// ✅ NUR DAS HIER NEU HINZUGEFÜGT
+app.get('/verify-email', authController.verifyEmail);
+
 // User/Data Routing
 app.post('/save-data', userController.saveData);
 app.post('/save-session', userController.saveSession);
 app.post('/delete-user', userController.deleteUser);
-
-
-app.post('/request-phone-code', authController.requestPhoneCode);
-app.post('/verify-phone-code', authController.verifyPhoneCode);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
