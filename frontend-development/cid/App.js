@@ -8,9 +8,9 @@ import { AppNavigator } from './src/navigation/AppNavigator';
  * Entry point - wraps entire app with AuthProvider for state management
  */
 export default function App() {
-  return (
-    <AuthProvider>
-      <AppNavigator />
-    </AuthProvider>
-  );
+    return (
+        <AuthProvider>
+            <AppNavigator />
+        </AuthProvider>
+    );
 }
