@@ -43,3 +43,7 @@ yarn-error.*
 
 # JetBrains
 .idea/
+
+# local backend secrets
+backend-development/.env.local
+backend-development/secrets/

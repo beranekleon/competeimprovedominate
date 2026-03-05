@@ -19,8 +19,9 @@ app.post('/login-phone', authController.loginPhone);
 app.post('/request-phone-code', authController.requestPhoneCode);
 app.post('/verify-phone-code', authController.verifyPhoneCode);
 
-// ✅ NUR DAS HIER NEU HINZUGEFÜGT
-app.get('/verify-email', authController.verifyEmail);
+if (typeof authController.verifyEmail === 'function') {
+    app.get('/verify-email', authController.verifyEmail);
+}
 
 // User/Data Routing
 app.post('/save-data', userController.saveData);

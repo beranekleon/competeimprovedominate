@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cid-backend-local
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.local
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/firebase-service-account.json
+    volumes:
+      - ./secrets/firebase-service-account.json:/secrets/firebase-service-account.json:ro
+    restart: "no"

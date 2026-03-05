@@ -1,11 +1,13 @@
-import { BACKEND_URL } from '@env';
+﻿import { BACKEND_URL } from '@env';
+const MANUAL_BACKEND_URL = 'https://cid-testing-228623557792.europe-west3.run.app';
+const EFFECTIVE_BACKEND_URL = MANUAL_BACKEND_URL || BACKEND_URL;
 
 /**
  * Base API client for all HTTP requests
  * Handles common fetch logic, error handling, and response parsing
  */
 class ApiClient {
-  constructor(baseURL = BACKEND_URL) {
+  constructor(baseURL = EFFECTIVE_BACKEND_URL) {
     this.baseURL = baseURL;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
@@ -68,3 +70,12 @@ class ApiClient {
 
 // Export singleton instance
 export default new ApiClient();
+
+
+
+
+
+
+
+
+
