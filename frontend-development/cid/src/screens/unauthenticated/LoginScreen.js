@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../../hooks/useAuth';
 
-export default function LoginScreen({
-                                      navigation,
-                                      onLogin,                // E-Mail + Passwort Login
-                                      onSendPhoneCode,        // Code per SMS/WhatsApp anfordern
-                                      onConfirmPhoneCode,     // Code bestätigen
-                                      phone,
-                                      setPhone,
-                                      code,
-                                      setCode,
-                                      confirm,
-                                      errorMessage,
-                                      loading
-                                    }) {
+export default function LoginScreen({ navigation }) {
+  const {
+    login,
+    requestPhoneCode,
+    confirmPhoneCode,
+    phoneAwaitingCode,
+    loginError,
+    loading,
+    setLoginError,
+  } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginMode, setLoginMode] = useState('email'); // 'email' oder 'phone'
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
 
   // Lade gespeicherte E-Mail beim Öffnen des Screens (falls vorhanden)
   useEffect(() => {
@@ -34,13 +35,40 @@ export default function LoginScreen({
     loadSavedEmail();
   }, []);
 
+  const handleEmailLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      setLoginError('E-Mail und Passwort erforderlich');
+      return;
+    }
+
+    await login(email.trim(), password);
+  };
+
+  const handleSendPhoneCode = async () => {
+    if (!phone.trim()) {
+      setLoginError('Telefonnummer erforderlich');
+      return;
+    }
+
+    await requestPhoneCode(phone.trim());
+  };
+
+  const handleConfirmPhoneLogin = async () => {
+    if (!phone.trim() || !code.trim()) {
+      setLoginError('Telefonnummer und Code erforderlich');
+      return;
+    }
+
+    await confirmPhoneCode(phone.trim(), code.trim());
+  };
+
   return (
       <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
 
-        {errorMessage && (
+        {loginError && (
             <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{errorMessage}</Text>
+              <Text style={styles.errorText}>{loginError}</Text>
             </View>
         )}
 
@@ -99,7 +127,7 @@ export default function LoginScreen({
 
               <TouchableOpacity
                   style={styles.loginButton}
-                  onPress={() => onLogin(email.trim(), password)}
+                  onPress={handleEmailLogin}
                   disabled={loading}
               >
                 {loading ? (
@@ -122,10 +150,10 @@ export default function LoginScreen({
                   keyboardType="phone-pad"
               />
 
-              {!confirm ? (
+                {!phoneAwaitingCode ? (
                   <TouchableOpacity
                       style={styles.loginButton}
-                      onPress={onSendPhoneCode}
+                    onPress={handleSendPhoneCode}
                       disabled={loading}
                   >
                     {loading ? (
@@ -147,7 +175,7 @@ export default function LoginScreen({
 
                     <TouchableOpacity
                         style={styles.loginButton}
-                        onPress={onConfirmPhoneCode}
+                      onPress={handleConfirmPhoneLogin}
                         disabled={loading}
                     >
                       {loading ? (
