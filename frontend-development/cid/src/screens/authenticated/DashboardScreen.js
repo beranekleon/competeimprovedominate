@@ -5,7 +5,9 @@ import {
   ActivityIndicator,
   StyleSheet,
   Alert,
+  TouchableOpacity
 } from 'react-native';
+
 import MapView, { Marker } from 'react-native-maps';
 import { useAuth } from '../../hooks/useAuth';
 import { useGPS } from '../../hooks/useGPS';
@@ -18,11 +20,14 @@ import userService from '../../services/user.service';
  * Main user dashboard with map and taskbar
  */
 export default function DashboardScreen({ navigation }) {
+
   const { loading, userEmail } = useAuth();
   const { location, errorMsg, region, isLoading: gpsLoading } = useGPS();
+
   const [isRunning, setIsRunning] = useState(false);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [recordingLoading, setRecordingLoading] = useState(false);
+
   const gpsTrackRef = useRef([]);
   const latestLocationRef = useRef(null);
 
@@ -31,13 +36,16 @@ export default function DashboardScreen({ navigation }) {
   }, [location]);
 
   useEffect(() => {
-    if (!isRunning) {
-      return;
-    }
+
+    if (!isRunning) return;
 
     const pushCurrentLocation = () => {
+
       const current = latestLocationRef.current;
-      if (!current || typeof current.latitude !== 'number' || typeof current.longitude !== 'number') {
+
+      if (!current ||
+          typeof current.latitude !== 'number' ||
+          typeof current.longitude !== 'number') {
         return;
       }
 
@@ -54,12 +62,16 @@ export default function DashboardScreen({ navigation }) {
     };
 
     pushCurrentLocation();
+
     const intervalId = setInterval(pushCurrentLocation, 5000);
 
     return () => clearInterval(intervalId);
+
   }, [isRunning]);
 
+
   const handleStartStop = async () => {
+
     if (!isRunning) {
       gpsTrackRef.current = [];
       setSessionStartTime(Date.now());
@@ -74,6 +86,7 @@ export default function DashboardScreen({ navigation }) {
 
     const stopTime = Date.now();
     const durationMs = Math.max(0, stopTime - sessionStartTime);
+
     const session = {
       startedAt: new Date(sessionStartTime).toISOString(),
       stoppedAt: new Date(stopTime).toISOString(),
@@ -83,34 +96,61 @@ export default function DashboardScreen({ navigation }) {
     };
 
     try {
+
       setRecordingLoading(true);
+
       await userService.saveSession(userEmail, session);
+
       setIsRunning(false);
       setSessionStartTime(null);
       gpsTrackRef.current = [];
+
     } catch (error) {
-      Alert.alert('Fehler', error.message || 'Session konnte nicht gespeichert werden.');
+
+      Alert.alert(
+        'Fehler',
+        error.message || 'Session konnte nicht gespeichert werden.'
+      );
+
     } finally {
       setRecordingLoading(false);
     }
   };
 
+
   return (
     <View style={styles.container}>
+
+      {/* USER LIST BUTTON */}
+      <TouchableOpacity
+        style={styles.userListButton}
+        onPress={() => navigation.navigate('Users')}
+      >
+        <Text style={styles.userListButtonText}>Users</Text>
+      </TouchableOpacity>
+
+
       {/* Full Screen Map */}
       <View style={styles.mapContainer}>
+
         {region ? (
+
           <MapView style={styles.map} region={region} showsUserLocation={true}>
             {location && <Marker coordinate={location} title="Deine Position" />}
           </MapView>
+
         ) : (
+
           <View style={styles.mapPlaceholder}>
             <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={{ marginTop: 10 }}>GPS wird gesucht...</Text>
             {errorMsg && <Text style={{ color: Colors.error }}>{errorMsg}</Text>}
           </View>
+
         )}
+
       </View>
+
 
       {/* Bottom Taskbar */}
       <TaskBar
@@ -121,27 +161,50 @@ export default function DashboardScreen({ navigation }) {
         rightButtonVisible={true}
         loading={loading || recordingLoading}
       />
+
     </View>
   );
 }
 
-// Screen-specific styles
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: Colors.background,
   },
+
   mapContainer: {
     flex: 1,
     overflow: 'hidden',
   },
+
   map: {
     flex: 1,
   },
+
   mapPlaceholder: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.lightGray,
   },
+
+  userListButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    zIndex: 10
+  },
+
+  userListButtonText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  }
+
 });
+
