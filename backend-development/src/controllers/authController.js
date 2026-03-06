@@ -3,22 +3,21 @@ const { admin, db } = require('../config/firebase');
 const { normalizeEmail, hashToken } = require('../utils/helpers');
 const twilio = require('twilio');
 
-// Twilio-Client initialisieren (nur einmal)
+// Twilio-Client initialisieren
 const twilioClient = twilio(
     process.env.TWILIO_ACCOUNT_SID,
     process.env.TWILIO_AUTH_TOKEN
 );
 
-// (Optional) Email Service Logik hierhin oder in eigenen Service
+// Email Service (bleibt wie bei dir)
 const sendResetCode = async (email, code) => {
-    // ... deine bestehende nodemailer Logik ...
     console.log(`[DEV] Passwort-Reset Code für ${email}: ${code}`);
 };
 
 exports.register = async (req, res) => {
     try {
         const email = normalizeEmail(req.body.email);
-        const { password, phone } = req.body; // neu: phone
+        const { password, phone } = req.body;
         if (!email || !password) return res.status(400).json({ fehler: "E-Mail oder Passwort fehlt" });
 
         const userRef = db.collection('users').doc(email);
@@ -30,7 +29,7 @@ exports.register = async (req, res) => {
         await userRef.set({
             email,
             password: hashedPassword,
-            phone: phone || null, // neu: Telefonnummer speichern (optional)
+            phone: phone || null,
             userData: { workouts: [], progress: {}, lastSync: null },
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
@@ -89,7 +88,6 @@ exports.loginPhone = async (req, res) => {
 
         const normalizedPhone = phone.trim();
 
-        // Suche nach User mit Telefonnummer
         const usersRef = db.collection('users');
         const snapshot = await usersRef.where('phone', '==', normalizedPhone).limit(1).get();
 
@@ -112,7 +110,7 @@ exports.loginPhone = async (req, res) => {
     }
 };
 
-// NEU: Twilio Verify – Code anfordern (SMS oder WhatsApp)
+// Twilio Verify – Code per SMS anfordern
 exports.requestPhoneCode = async (req, res) => {
     try {
         const { phone } = req.body;
@@ -124,24 +122,24 @@ exports.requestPhoneCode = async (req, res) => {
         const snapshot = await db.collection('users').where('phone', '==', normalizedPhone).limit(1).get();
         if (snapshot.empty) return res.status(404).json({ fehler: "Nummer nicht registriert" });
 
-        // OTP per Twilio Verify senden
+        // OTP per Twilio Verify senden – SMS
         const verification = await twilioClient.verify.v2.services(process.env.TWILIO_VERIFY_SERVICE_SID)
             .verifications
             .create({
                 to: normalizedPhone,
-                channel: 'sms' // ändere zu 'whatsapp' für WhatsApp
+                channel: 'sms'
             });
 
-        console.log(`OTP gesendet an ${normalizedPhone} - Status: ${verification.status}`);
+        console.log(`SMS-OTP gesendet an ${normalizedPhone} - Status: ${verification.status}`);
 
-        res.status(200).json({ nachricht: "Code gesendet" });
+        res.status(200).json({ nachricht: "Code per SMS gesendet" });
     } catch (error) {
         console.error("Twilio Verify Fehler:", error);
         res.status(500).json({ fehler: "Code konnte nicht gesendet werden" });
     }
 };
 
-// NEU: Twilio Verify – Code prüfen & Login
+// Twilio Verify – Code prüfen & Login
 exports.verifyPhoneCode = async (req, res) => {
     try {
         const { phone, code } = req.body;

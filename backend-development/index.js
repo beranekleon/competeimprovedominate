@@ -8,27 +8,21 @@ app.use(cors());
 app.use(express.json());
 
 // Status
-app.get('/status', (req, res) => res.json({ message: "Backend online!" }));
+app.get('/status', (req, res) => res.json({ nachricht: "Backend online!" }));
 
-// Auth Routing
+// Auth Routen
 app.post('/register', authController.register);
 app.post('/login', authController.login);
 app.post('/google-login', authController.googleLogin);
 app.post('/login-phone', authController.loginPhone);
+app.post('/request-phone-code', authController.requestPhoneCode);   // NEU
+app.post('/verify-phone-code', authController.verifyPhoneCode);    // NEU
 
-app.post('/request-phone-code', authController.requestPhoneCode);
-app.post('/verify-phone-code', authController.verifyPhoneCode);
-
-if (typeof authController.verifyEmail === 'function') {
-    app.get('/verify-email', authController.verifyEmail);
-}
-
-// User/Data Routing
+// User/Data Routen
 app.post('/save-data', userController.saveData);
-app.post('/save-session', userController.saveSession);
 app.post('/delete-user', userController.deleteUser);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server läuft auf Port ${PORT}`);
 });
