@@ -20,8 +20,8 @@ export default function TaskBar({
   return (
     <View style={styles.taskbar}>
       <View style={styles.taskbarContent}>
-        <View style={styles.sideButtonsRow}>
-          <View style={styles.sideSlotLeft}>
+        <View style={styles.buttonsRow}>
+          <View style={styles.buttonSlot}>
             {leftButtonVisible && (
               <TouchableOpacity
                 style={styles.leftButton}
@@ -33,7 +33,23 @@ export default function TaskBar({
             )}
           </View>
 
-          <View style={styles.sideSlotRight}>
+          <View style={styles.buttonSlot}>
+            <TouchableOpacity
+              style={[styles.centerButton, centerButtonActive && styles.centerButtonActive]}
+              onPress={onCenterPress}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text numberOfLines={1} ellipsizeMode="tail" style={styles.centerButtonText}>
+                  {centerButtonText}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonSlot}>
             {rightButtonVisible && (
               <TouchableOpacity
                 style={styles.rightButton}
@@ -44,20 +60,6 @@ export default function TaskBar({
               </TouchableOpacity>
             )}
           </View>
-        </View>
-
-        <View pointerEvents="box-none" style={styles.centerOverlay}>
-          <TouchableOpacity
-            style={[styles.centerButton, centerButtonActive && styles.centerButtonActive]}
-            onPress={onCenterPress}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.centerButtonText}>{centerButtonText}</Text>
-            )}
-          </TouchableOpacity>
         </View>
       </View>
     </View>

@@ -9,35 +9,22 @@ export const TaskBarStyles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   taskbarContent: {
-    position: 'relative',
-    justifyContent: 'center',
     minHeight: 56,
   },
-  sideButtonsRow: {
+  buttonsRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  sideSlotLeft: {
+  buttonSlot: {
     flex: 1,
-    alignItems: 'flex-start',
-    paddingLeft: 16,
-  },
-  sideSlotRight: {
-    flex: 1,
-    alignItems: 'flex-end',
-    paddingRight: 16,
-  },
-  centerOverlay: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
   centerButton: {
-    paddingHorizontal: 48,
+    width: '92%',
+    maxWidth: 180,
+    paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: Colors.primary,
     borderRadius: 50,
