@@ -1,12 +1,12 @@
 import React, { useCallback, useRef } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useGPS } from '../../hooks/useGPS';
 import { useSessionRecorder } from '../../hooks/useSessionRecorder';
 import { useTerritoryGeometry } from '../../hooks/useTerritoryGeometry';
 import { useUserSessions } from '../../hooks/useUserSessions';
-import { Colors } from '../../styles';
+import { DashboardStyles } from '../../styles';
 import DashboardMap from '../../components/DashboardMap';
 import MapControls from '../../components/MapControls';
 import TaskBar from '../../components/TaskBar';
@@ -115,10 +115,10 @@ export default function DashboardScreen({ navigation }) {
   }, [territoryCoordinates, handleRecenter]);
 
   return (
-    <View style={styles.container}>
+    <View style={DashboardStyles.container}>
 
       {/* Full Screen Map */}
-      <View style={styles.mapContainer}>
+      <View style={DashboardStyles.mapContainer}>
         <DashboardMap
           mapRef={mapRef}
           initialRegion={region || DEFAULT_REGION}
@@ -156,22 +156,4 @@ export default function DashboardScreen({ navigation }) {
     </View>
   );
 }
-
-
-const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-
-  mapContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-
-  map: {
-    flex: 1,
-  },
-});
 

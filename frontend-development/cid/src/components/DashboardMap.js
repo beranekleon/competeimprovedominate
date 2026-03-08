@@ -1,7 +1,7 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
-import { Colors } from '../styles';
+import { DashboardMapStyles, DashboardMapTheme } from '../styles';
 
 /**
  * DashboardMap
@@ -20,10 +20,10 @@ export default function DashboardMap({
 }) {
   if (!canRenderMap) {
     return (
-      <View style={styles.mapPlaceholder}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.searchText}>GPS wird gesucht...</Text>
-        {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
+      <View style={DashboardMapStyles.mapPlaceholder}>
+        <ActivityIndicator size="large" color={DashboardMapTheme.loadingIndicatorColor} />
+        <Text style={DashboardMapStyles.searchText}>GPS wird gesucht...</Text>
+        {errorMsg && <Text style={DashboardMapStyles.errorText}>{errorMsg}</Text>}
       </View>
     );
   }
@@ -31,7 +31,7 @@ export default function DashboardMap({
   return (
     <MapView
       ref={mapRef}
-      style={styles.map}
+      style={DashboardMapStyles.map}
       initialRegion={initialRegion}
       showsUserLocation={true}
     >
@@ -39,8 +39,8 @@ export default function DashboardMap({
         <Polygon
           key={`territory-${index}`}
           coordinates={ring}
-          strokeColor="rgba(255, 0, 0, 1)"
-          fillColor="rgba(255, 0, 0, 0.1)"
+          strokeColor={DashboardMapTheme.strokeColor}
+          fillColor={DashboardMapTheme.fillColor}
           strokeWidth={2}
         />
       ))}
@@ -49,7 +49,7 @@ export default function DashboardMap({
         <Polyline
           key={`session-track-${index}`}
           coordinates={track}
-          strokeColor="rgba(255, 0, 0, 1)"
+          strokeColor={DashboardMapTheme.strokeColor}
           strokeWidth={3}
         />
       ))}
@@ -57,7 +57,7 @@ export default function DashboardMap({
       {isRunning && liveTrack.length >= 2 && (
         <Polyline
           coordinates={liveTrack}
-          strokeColor="rgba(255, 0, 0, 1)"
+          strokeColor={DashboardMapTheme.strokeColor}
           strokeWidth={4}
         />
       )}
@@ -66,21 +66,3 @@ export default function DashboardMap({
     </MapView>
   );
 }
-
-const styles = StyleSheet.create({
-  map: {
-    flex: 1,
-  },
-  mapPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.lightGray,
-  },
-  searchText: {
-    marginTop: 10,
-  },
-  errorText: {
-    color: Colors.error,
-  },
-});
