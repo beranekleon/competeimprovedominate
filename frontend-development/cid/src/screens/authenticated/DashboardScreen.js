@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import {
   Text,
   View,
@@ -12,9 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useGPS } from '../../hooks/useGPS';
 import { useSessionRecorder } from '../../hooks/useSessionRecorder';
+import { useUserSessions } from '../../hooks/useUserSessions';
 import { Colors } from '../../styles';
 import TaskBar from '../../components/TaskBar';
-import userService from '../../services/user.service';
 import {
   buildExpansionFeatureFromTrack,
   isClosedTrack,
@@ -44,30 +44,20 @@ export default function DashboardScreen({ navigation }) {
   // const { location, errorMsg, region, isLoading: gpsLoading } = useGPS();
   const { location, errorMsg, region } = useGPS();
   const insets = useSafeAreaInsets();
-  const [sessions, setSessions] = useState([]);
-  const [sessionsLoading, setSessionsLoading] = useState(false);
   const mapRef = useRef(null);
 
-  const fetchSessions = useCallback(async () => {
-    if (!userEmail) {
-      setSessions([]);
-      return;
-    }
+  const handleSessionsFetchError = useCallback((error) => {
+    Alert.alert('Fehler', error?.message || 'Sessions konnten nicht geladen werden.');
+  }, []);
 
-    try {
-      setSessionsLoading(true);
-      const response = await userService.getSessions(userEmail);
-      setSessions(Array.isArray(response.sessions) ? response.sessions : []);
-    } catch (error) {
-      Alert.alert('Fehler', error.message || 'Sessions konnten nicht geladen werden.');
-    } finally {
-      setSessionsLoading(false);
-    }
-  }, [userEmail]);
-
-  useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+  const {
+    sessions,
+    sessionsLoading,
+    fetchSessions,
+  } = useUserSessions({
+    userEmail,
+    onFetchError: handleSessionsFetchError,
+  });
 
   const handleSessionSaveError = useCallback((error) => {
     Alert.alert(
