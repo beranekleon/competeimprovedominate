@@ -26,6 +26,7 @@ if (typeof authController.verifyEmail === 'function') {
 // User/Data Routing
 app.post('/save-data', userController.saveData);
 app.post('/save-session', userController.saveSession);
+app.get('/user-sessions', userController.getSessions);
 app.post('/delete-user', userController.deleteUser);
 
 const PORT = process.env.PORT || 8080;

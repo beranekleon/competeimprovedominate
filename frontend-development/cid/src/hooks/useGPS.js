@@ -1,6 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import * as Location from 'expo-location';
 
+const GPS_TRACKING_OPTIONS = {
+  accuracy: Location.Accuracy.BestForNavigation,
+  distanceInterval: 2,
+  timeInterval: 1500,
+};
+
 /**
  * Custom hook for GPS tracking
  * Handles location permissions and continuous position updates
@@ -46,10 +52,7 @@ export function useGPS() {
 
         // Start watching position
         locationSubscription = await Location.watchPositionAsync(
-          { 
-            accuracy: Location.Accuracy.High, 
-            distanceInterval: 5 
-          },
+          GPS_TRACKING_OPTIONS,
           (newLoc) => updateLocationState(newLoc)
         );
       } catch (err) {
