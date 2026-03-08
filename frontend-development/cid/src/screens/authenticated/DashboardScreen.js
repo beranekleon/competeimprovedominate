@@ -1,13 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import {
-  Text,
-  View,
-  ActivityIndicator,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import MapView, { Marker, Polygon, Polyline } from 'react-native-maps';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useGPS } from '../../hooks/useGPS';
@@ -15,6 +7,8 @@ import { useSessionRecorder } from '../../hooks/useSessionRecorder';
 import { useTerritoryGeometry } from '../../hooks/useTerritoryGeometry';
 import { useUserSessions } from '../../hooks/useUserSessions';
 import { Colors } from '../../styles';
+import DashboardMap from '../../components/DashboardMap';
+import MapControls from '../../components/MapControls';
 import TaskBar from '../../components/TaskBar';
 import { isValidCoordinate } from '../../utils/territory.utils';
 
@@ -125,72 +119,24 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Full Screen Map */}
       <View style={styles.mapContainer}>
-        {region || sessions.length > 0 ? (
-          <MapView
-            ref={mapRef}
-            style={styles.map}
-            initialRegion={region || DEFAULT_REGION}
-            showsUserLocation={true}
-          >
-            {mergedTerritoryRings.map((ring, index) => (
-              <Polygon
-                key={`territory-${index}`}
-                coordinates={ring}
-                strokeColor="rgba(255, 0, 0, 1)"
-                fillColor="rgba(255, 0, 0, 0.1)"
-                strokeWidth={2}
-              />
-            ))}
+        <DashboardMap
+          mapRef={mapRef}
+          initialRegion={region || DEFAULT_REGION}
+          canRenderMap={Boolean(region || sessions.length > 0)}
+          mergedTerritoryRings={mergedTerritoryRings}
+          sessionTracks={sessionTracks}
+          isRunning={isRunning}
+          liveTrack={liveTrack}
+          location={location}
+          errorMsg={errorMsg}
+        />
 
-            {sessionTracks.map((track, index) => (
-              <Polyline
-                key={`session-track-${index}`}
-                coordinates={track}
-                strokeColor="rgba(255, 0, 0, 1)"
-                strokeWidth={3}
-              />
-            ))}
-
-            {isRunning && liveTrack.length >= 2 && (
-              <Polyline
-                coordinates={liveTrack}
-                strokeColor="rgba(255, 0, 0, 1)"
-                strokeWidth={4}
-              />
-            )}
-
-            {location && <Marker coordinate={location} title="Deine Position" />}
-          </MapView>
-
-        ) : (
-
-          <View style={styles.mapPlaceholder}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={{ marginTop: 10 }}>GPS wird gesucht...</Text>
-            {errorMsg && <Text style={{ color: Colors.error }}>{errorMsg}</Text>}
-          </View>
-
-        )}
-
-        <View
-          style={[
-            styles.mapControls,
-            {
-              top: Math.max(12, insets.top + 8),
-              right: Math.max(12, insets.right + 12),
-            },
-          ]}
-        >
-          <View style={styles.rightMapControls}>
-            <TouchableOpacity style={styles.mapControlButton} onPress={handleShowAllTerritories}>
-              <Text style={styles.recenterButtonText}>👁</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.mapControlButton} onPress={handleRecenter}>
-              <Text style={styles.recenterButtonText}>Center</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <MapControls
+          top={Math.max(12, insets.top + 8)}
+          right={Math.max(12, insets.right + 12)}
+          onShowAllPress={handleShowAllTerritories}
+          onRecenterPress={handleRecenter}
+        />
       </View>
 
 
@@ -226,35 +172,6 @@ const styles = StyleSheet.create({
 
   map: {
     flex: 1,
-  },
-
-  mapPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.lightGray,
-  },
-
-  mapControls: {
-    position: 'absolute',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  rightMapControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  mapControlButton: {
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  recenterButtonText: {
-    color: Colors.white,
-    fontWeight: '600',
   },
 });
 
