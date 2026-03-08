@@ -495,15 +495,6 @@ export default function DashboardScreen({ navigation }) {
   return (
     <View style={styles.container}>
 
-      {/* USER LIST BUTTON */}
-      <TouchableOpacity
-        style={styles.userListButton}
-        onPress={() => navigation.navigate('Users')}
-      >
-        <Text style={styles.userListButtonText}>Users</Text>
-      </TouchableOpacity>
-
-
       {/* Full Screen Map */}
       <View style={styles.mapContainer}>
         {region || sessions.length > 0 ? (
@@ -563,13 +554,19 @@ export default function DashboardScreen({ navigation }) {
             },
           ]}
         >
-          <TouchableOpacity style={styles.mapControlButton} onPress={handleShowAllTerritories}>
-            <Text style={styles.recenterButtonText}>👁</Text>
+          <TouchableOpacity style={styles.mapControlButton} onPress={() => navigation.navigate('Users')}>
+            <Text style={styles.recenterButtonText}>Friends</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.mapControlButton} onPress={handleRecenter}>
-            <Text style={styles.recenterButtonText}>Center</Text>
-          </TouchableOpacity>
+          <View style={styles.rightMapControls}>
+            <TouchableOpacity style={styles.mapControlButton} onPress={handleShowAllTerritories}>
+              <Text style={styles.recenterButtonText}>👁</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.mapControlButton} onPress={handleRecenter}>
+              <Text style={styles.recenterButtonText}>Center</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -612,27 +609,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGray,
   },
 
-  userListButton: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
-    zIndex: 10
-  },
-
-  userListButtonText: {
-    color: '#fff',
-    fontWeight: 'bold'
-  },
-
   mapControls: {
     position: 'absolute',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  rightMapControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   mapControlButton: {
     backgroundColor: 'rgba(0,0,0,0.65)',
