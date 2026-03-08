@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   Text,
   View,
@@ -12,18 +12,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useGPS } from '../../hooks/useGPS';
 import { useSessionRecorder } from '../../hooks/useSessionRecorder';
+import { useTerritoryGeometry } from '../../hooks/useTerritoryGeometry';
 import { useUserSessions } from '../../hooks/useUserSessions';
 import { Colors } from '../../styles';
 import TaskBar from '../../components/TaskBar';
-import {
-  buildExpansionFeatureFromTrack,
-  isClosedTrack,
-  isValidCoordinate,
-  mergePolygonFeatures,
-  toCoordinateTrack,
-  toMapPolygonRings,
-  toPolygonFeature,
-} from '../../utils/territory.utils';
+import { isValidCoordinate } from '../../utils/territory.utils';
 
 const DEFAULT_REGION = {
   latitude: 48.2082,
@@ -31,8 +24,6 @@ const DEFAULT_REGION = {
   latitudeDelta: 0.02,
   longitudeDelta: 0.02,
 };
-
-const TERRITORY_CLOSURE_DISTANCE_METERS = 10;
 
 /**
  * DashboardScreen
@@ -78,57 +69,11 @@ export default function DashboardScreen({ navigation }) {
     onSaveError: handleSessionSaveError,
   });
 
-  const sessionTracks = useMemo(
-    () => sessions.map((session) => toCoordinateTrack(session.locations)).filter((track) => track.length >= 2),
-    [sessions]
-  );
-
-  const mergedTerritoryFeature = useMemo(() => {
-    const closedTrackFeatures = sessionTracks
-      .filter((track) => isClosedTrack(track))
-      .map((track) => toPolygonFeature(track))
-      .filter(Boolean);
-
-    let merged = mergePolygonFeatures(closedTrackFeatures);
-
-    if (!merged) {
-      return null;
-    }
-
-    const openTracks = sessionTracks.filter((track) => !isClosedTrack(track) && track.length >= 3);
-
-    for (let i = 0; i < openTracks.length; i += 1) {
-      const territoryRings = toMapPolygonRings(merged);
-      const expansionFeature = buildExpansionFeatureFromTrack(
-        openTracks[i],
-        territoryRings,
-        TERRITORY_CLOSURE_DISTANCE_METERS
-      );
-
-      if (!expansionFeature) {
-        continue;
-      }
-
-      const expanded = mergePolygonFeatures([merged, expansionFeature]);
-      if (expanded) {
-        merged = expanded;
-      }
-    }
-
-    return merged;
-  }, [sessionTracks]);
-
-  const mergedTerritoryRings = useMemo(
-    () => toMapPolygonRings(mergedTerritoryFeature),
-    [mergedTerritoryFeature]
-  );
-
-  const territoryCoordinates = useMemo(() => (
-    sessionTracks.flat().map((point) => ({
-      latitude: point.latitude,
-      longitude: point.longitude,
-    }))
-  ), [sessionTracks]);
+  const {
+    sessionTracks,
+    mergedTerritoryRings,
+    territoryCoordinates,
+  } = useTerritoryGeometry({ sessions });
 
   const handleRecenter = useCallback(() => {
     if (!mapRef.current) {
