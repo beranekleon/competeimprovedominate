@@ -12,7 +12,9 @@ export const Colors = {
 
   // Backgrounds
   white: '#fff',
+  background: '#fff',
   lightBackground: '#f8f9fa',
+  lightGray: '#f8f9fa',
   inputBackground: '#fafafa',
 
   // Borders & Dividers
@@ -22,6 +24,7 @@ export const Colors = {
 
   // Text Colors
   textPrimary: '#333',
+  textDark: '#333',
   textSecondary: '#555',
   textGray: 'gray',
 

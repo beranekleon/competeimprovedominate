@@ -7,9 +7,9 @@ This directory contains centralized styling utilities for the React Native app. 
 ### `colors.js`
 Centralized color palette used throughout the app:
 - **Primary Colors**: `primary` (#007AFF), `success` (#34C759), `purple` (#5856D6), `neutral` (#8E8E93)
-- **Backgrounds**: `white`, `lightBackground`, `inputBackground`
+- **Backgrounds**: `white`, `background`, `lightBackground`, `lightGray`, `inputBackground`
 - **Borders**: `borderLight`, `borderLighter`, `borderLightest`
-- **Text Colors**: `textPrimary`, `textSecondary`, `textGray`
+- **Text Colors**: `textPrimary`, `textDark`, `textSecondary`, `textGray`
 - **Status Colors**: `error`, `errorBackground`, `errorText`, `red`
 - **Transparent**: `overlay`
 
