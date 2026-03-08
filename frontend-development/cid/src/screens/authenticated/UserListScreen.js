@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import api from "../../services/api";
+import userListService from "../../services/userList.service";
 import TaskBar from "../../components/TaskBar";
 
 export default function UserListScreen({ navigation }) {
@@ -10,8 +10,8 @@ export default function UserListScreen({ navigation }) {
 
   const fetchUsers = async () => {
     try {
-      const res = await api.get("/users"); // backend endpoint
-      setUsers(res.data || []);
+      const usersResponse = await userListService.getUsers();
+      setUsers(usersResponse);
     } catch (err) {
       console.log("User fetch error:", err);
     } finally {
