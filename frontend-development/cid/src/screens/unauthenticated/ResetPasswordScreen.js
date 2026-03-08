@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, Button } from 'react-native';
 import { BACKEND_URL } from '@env';
-import { CommonStyles, Colors } from '../../styles';
+import { CommonStyles, Colors, ResetPasswordScreenStyles } from '../../styles';
 
 export default function ResetPasswordScreen({ navigation }) {
   const [step, setStep] = useState(1); // 1 = Code anfordern, 2 = Passwort setzen
@@ -77,9 +77,9 @@ export default function ResetPasswordScreen({ navigation }) {
       {step === 1 ? (
         <>
           <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={requestCode} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={CommonStyles.buttonText}>Code anfordern</Text>}
+            {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={CommonStyles.buttonText}>Code anfordern</Text>}
           </TouchableOpacity>
-          <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
+          <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
         </>
       ) : (
         <>
@@ -99,15 +99,15 @@ export default function ResetPasswordScreen({ navigation }) {
           />
 
           <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={resetPassword} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={CommonStyles.buttonText}>Passwort setzen</Text>}
+            {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={CommonStyles.buttonText}>Passwort setzen</Text>}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setStep(1)} style={CommonStyles.forgotBtn}>
             <Text style={CommonStyles.linkText}>Neuen Code anfordern</Text>
           </TouchableOpacity>
 
-          <View style={{ marginTop: 20, width: '100%' }}>
-            <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
+          <View style={ResetPasswordScreenStyles.backButtonContainer}>
+            <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
           </View>
         </>
       )}

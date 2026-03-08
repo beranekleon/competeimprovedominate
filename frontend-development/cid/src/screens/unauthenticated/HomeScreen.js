@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
-import { CommonStyles, Colors } from '../../styles';
+import { CommonStyles } from '../../styles';
 
 /**
  * HomeScreen
@@ -20,7 +20,7 @@ export default function HomeScreen({ navigation }) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[CommonStyles.mainButton, { backgroundColor: Colors.success }]}
+        style={[CommonStyles.mainButton, CommonStyles.registerButton]}
         onPress={() => navigation.navigate('Register')}
       >
         <Text style={CommonStyles.buttonText}>Registrieren</Text>

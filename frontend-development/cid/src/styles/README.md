@@ -96,6 +96,23 @@ import { CommonStyles } from '../styles';
 ### `index.js`
 Central export point for all styling utilities.
 
+### `dashboard.js`
+Shared dashboard-related styles and map theme constants:
+- `DashboardStyles` - Dashboard screen container styles
+- `DashboardMapStyles` - Dashboard map and placeholder styles
+- `DashboardMapTheme` - Shared map colors (stroke, fill, loader)
+- `MapControlsStyles` - Dashboard map control button styles
+
+### `screenStyles.js`
+Shared screen-specific styles that do not fit generic common patterns:
+- `ProfileScreenStyles`
+- `UserListScreenStyles`
+- `ResetPasswordScreenStyles`
+
+### `taskbar.js`
+Shared styles for the reusable `TaskBar` component:
+- `TaskBarStyles`
+
 **Usage:**
 ```javascript
 // Import specific utilities

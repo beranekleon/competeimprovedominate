@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
-import { CommonStyles } from '../../styles';
+import { CommonStyles, Colors } from '../../styles';
 
 /**
  * RegisterScreen
@@ -76,13 +76,13 @@ export default function RegisterScreen({ navigation }) {
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={Colors.white} />
         ) : (
           <Text style={CommonStyles.buttonText}>Konto erstellen</Text>
         )}
       </TouchableOpacity>
 
-      <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
+      <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
     </View>
   );
 }

@@ -7,12 +7,11 @@ import {
   ActivityIndicator,
   Modal,
   Alert,
-  StyleSheet,
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
-import { CommonStyles, Colors } from '../../styles';
+import { CommonStyles, Colors, ProfileScreenStyles } from '../../styles';
 import TaskBar from '../../components/TaskBar';
 
 /**
@@ -70,18 +69,18 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={ProfileScreenStyles.container}>
       {/* Header with Title */}
-      <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Profil</Text>
+      <SafeAreaView edges={['top']} style={ProfileScreenStyles.headerSafeArea}>
+        <View style={ProfileScreenStyles.header}>
+          <Text style={ProfileScreenStyles.title}>Profil</Text>
         </View>
       </SafeAreaView>
 
       {/* Content */}
-      <ScrollView style={styles.scrollContainer}>
+      <ScrollView style={ProfileScreenStyles.scrollContainer}>
         {/* Cloud Notes Section */}
-        <Text style={styles.sectionTitle}>Cloud-Notizen</Text>
+        <Text style={ProfileScreenStyles.sectionTitle}>Cloud-Notizen</Text>
         <TextInput
           style={CommonStyles.multilineInput}
           value={userData}
@@ -93,12 +92,12 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Test Connection Button */}
         <TouchableOpacity
-          style={[CommonStyles.buttonSecondary, styles.testButton]}
+          style={[CommonStyles.buttonSecondary, ProfileScreenStyles.testButton]}
           onPress={handleTestConnection}
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={Colors.white} />
           ) : (
             <Text style={CommonStyles.buttonText}>Verbindung testen</Text>
           )}
@@ -106,12 +105,12 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Logout Button */}
         <TouchableOpacity
-          style={[CommonStyles.buttonSecondary, styles.logoutButton]}
+          style={[CommonStyles.buttonSecondary, ProfileScreenStyles.logoutButton]}
           onPress={handleLogout}
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={Colors.white} />
           ) : (
             <Text style={CommonStyles.buttonText}>Logout & Speichern</Text>
           )}
@@ -140,7 +139,7 @@ export default function ProfileScreen({ navigation }) {
               onChangeText={setDeletePassword}
               editable={!loading}
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={ProfileScreenStyles.modalActionsRow}>
               <TouchableOpacity
                 onPress={() => {
                   setDeleteModalVisible(false);
@@ -148,13 +147,13 @@ export default function ProfileScreen({ navigation }) {
                 }}
                 disabled={loading}
               >
-                <Text style={{ color: Colors.textGray }}>Abbrechen</Text>
+                <Text style={ProfileScreenStyles.modalCancelText}>Abbrechen</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleDeleteConfirm} disabled={loading}>
                 {loading ? (
                   <ActivityIndicator color={Colors.red} />
                 ) : (
-                  <Text style={{ color: Colors.red, fontWeight: 'bold' }}>Löschen</Text>
+                  <Text style={ProfileScreenStyles.modalDeleteText}>Löschen</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -177,44 +176,3 @@ export default function ProfileScreen({ navigation }) {
     </View>
   );
 }
-
-// Screen-specific styles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  headerSafeArea: {
-    backgroundColor: Colors.background,
-  },
-  header: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.textDark,
-  },
-  scrollContainer: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.textDark,
-    marginBottom: 12,
-  },
-  testButton: {
-    marginTop: 16,
-    backgroundColor: Colors.purple,
-  },
-  logoutButton: {
-    marginTop: 16,
-    backgroundColor: Colors.purple,
-  },
-});

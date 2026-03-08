@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../hooks/useAuth';
+import { CommonStyles, Colors } from '../../styles';
 
 export default function LoginScreen({ navigation }) {
   const {
@@ -63,27 +64,27 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+      <View style={CommonStyles.screenContainer}>
+        <Text style={CommonStyles.title}>Login</Text>
 
         {loginError && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{loginError}</Text>
+            <View style={CommonStyles.errorBox}>
+              <Text style={CommonStyles.errorText}>{loginError}</Text>
             </View>
         )}
 
         {/* Auswahl: E-Mail oder Telefon */}
-        <View style={styles.modeButtons}>
+        <View style={CommonStyles.modeButtons}>
           <TouchableOpacity
               style={[
-                styles.modeButton,
-                loginMode === 'email' && styles.modeButtonActive
+                CommonStyles.modeButton,
+                loginMode === 'email' && CommonStyles.modeButtonActive
               ]}
               onPress={() => setLoginMode('email')}
           >
             <Text style={[
-              styles.modeButtonText,
-              loginMode === 'email' && styles.modeButtonTextActive
+              CommonStyles.modeButtonText,
+              loginMode === 'email' && CommonStyles.modeButtonTextActive
             ]}>
               Mit E-Mail
             </Text>
@@ -91,14 +92,14 @@ export default function LoginScreen({ navigation }) {
 
           <TouchableOpacity
               style={[
-                styles.modeButton,
-                loginMode === 'phone' && styles.modeButtonActive
+                CommonStyles.modeButton,
+                loginMode === 'phone' && CommonStyles.modeButtonActive
               ]}
               onPress={() => setLoginMode('phone')}
           >
             <Text style={[
-              styles.modeButtonText,
-              loginMode === 'phone' && styles.modeButtonTextActive
+              CommonStyles.modeButtonText,
+              loginMode === 'phone' && CommonStyles.modeButtonTextActive
             ]}>
               Mit Telefonnummer
             </Text>
@@ -107,9 +108,9 @@ export default function LoginScreen({ navigation }) {
 
         {/* E-Mail-Bereich */}
         {loginMode === 'email' && (
-            <View style={styles.form}>
+            <View style={CommonStyles.form}>
               <TextInput
-                  style={styles.input}
+                  style={CommonStyles.input}
                   placeholder="E-Mail"
                   value={email}
                   onChangeText={setEmail}
@@ -118,7 +119,7 @@ export default function LoginScreen({ navigation }) {
               />
 
               <TextInput
-                  style={styles.input}
+                  style={CommonStyles.input}
                   placeholder="Passwort"
                   value={password}
                   onChangeText={setPassword}
@@ -126,14 +127,14 @@ export default function LoginScreen({ navigation }) {
               />
 
               <TouchableOpacity
-                  style={styles.loginButton}
+                  style={CommonStyles.loginButton}
                   onPress={handleEmailLogin}
                   disabled={loading}
               >
                 {loading ? (
-                    <ActivityIndicator color="#fff" />
+                    <ActivityIndicator color={Colors.white} />
                 ) : (
-                    <Text style={styles.buttonText}>Mit E-Mail anmelden</Text>
+                    <Text style={CommonStyles.buttonText}>Mit E-Mail anmelden</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -141,9 +142,9 @@ export default function LoginScreen({ navigation }) {
 
         {/* Telefon-Bereich */}
         {loginMode === 'phone' && (
-            <View style={styles.form}>
+            <View style={CommonStyles.form}>
               <TextInput
-                  style={styles.input}
+                  style={CommonStyles.input}
                   placeholder="+49123456789"
                   value={phone}
                   onChangeText={setPhone}
@@ -152,20 +153,20 @@ export default function LoginScreen({ navigation }) {
 
                 {!phoneAwaitingCode ? (
                   <TouchableOpacity
-                      style={styles.loginButton}
+                      style={CommonStyles.loginButton}
                     onPress={handleSendPhoneCode}
                       disabled={loading}
                   >
                     {loading ? (
-                        <ActivityIndicator color="#fff" />
+                        <ActivityIndicator color={Colors.white} />
                     ) : (
-                        <Text style={styles.buttonText}>Code per SMS/WhatsApp senden</Text>
+                        <Text style={CommonStyles.buttonText}>Code per SMS/WhatsApp senden</Text>
                     )}
                   </TouchableOpacity>
               ) : (
                   <>
                     <TextInput
-                        style={styles.input}
+                        style={CommonStyles.input}
                         placeholder="Code aus SMS/WhatsApp"
                         value={code}
                         onChangeText={setCode}
@@ -174,14 +175,14 @@ export default function LoginScreen({ navigation }) {
                     />
 
                     <TouchableOpacity
-                        style={styles.loginButton}
+                        style={CommonStyles.loginButton}
                       onPress={handleConfirmPhoneLogin}
                         disabled={loading}
                     >
                       {loading ? (
-                          <ActivityIndicator color="#fff" />
+                          <ActivityIndicator color={Colors.white} />
                       ) : (
-                          <Text style={styles.buttonText}>Code bestätigen</Text>
+                          <Text style={CommonStyles.buttonText}>Code bestätigen</Text>
                       )}
                     </TouchableOpacity>
                   </>
@@ -190,103 +191,11 @@ export default function LoginScreen({ navigation }) {
         )}
 
         {/* Zusätzliche Links */}
-        <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={styles.forgotBtn}>
-          <Text style={styles.forgotText}>Passwort vergessen?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={CommonStyles.forgotBtn}>
+          <Text style={CommonStyles.linkText}>Passwort vergessen?</Text>
         </TouchableOpacity>
 
-        <Button title="Zurück" onPress={() => navigation.goBack()} color="gray" />
+        <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
       </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  errorBox: {
-    backgroundColor: '#ffebee',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#f44336',
-  },
-  errorText: {
-    color: '#d32f2f',
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-  modeButtons: {
-    flexDirection: 'row',
-    width: '100%',
-    marginBottom: 25,
-    borderRadius: 10,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: 14,
-    backgroundColor: '#f8f8f8',
-    alignItems: 'center',
-  },
-  modeButtonActive: {
-    backgroundColor: '#007AFF',
-  },
-  modeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#555',
-  },
-  modeButtonTextActive: {
-    color: '#fff',
-  },
-  form: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    height: 52,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginVertical: 8,
-    backgroundColor: '#fafafa',
-    fontSize: 16,
-  },
-  loginButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 15,
-    borderRadius: 10,
-    width: '100%',
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotBtn: {
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  forgotText: {
-    color: '#007AFF',
-    textDecorationLine: 'underline',
-    fontSize: 16,
-  },
-});

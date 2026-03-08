@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import userListService from "../../services/userList.service";
 import TaskBar from "../../components/TaskBar";
+import { UserListScreenStyles } from "../../styles";
 
 export default function UserListScreen({ navigation }) {
   const [users, setUsers] = useState([]);
@@ -24,23 +25,23 @@ export default function UserListScreen({ navigation }) {
   }, []);
 
   const renderUser = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.name}>{item.email}</Text>
+    <View style={UserListScreenStyles.card}>
+      <Text style={UserListScreenStyles.name}>{item.email}</Text>
     </View>
   );
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={UserListScreenStyles.center}>
         <ActivityIndicator />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
-      <View style={styles.container}>
-        <Text style={styles.title}>User List</Text>
+    <SafeAreaView style={UserListScreenStyles.safeArea} edges={["top", "left", "right"]}>
+      <View style={UserListScreenStyles.container}>
+        <Text style={UserListScreenStyles.title}>User List</Text>
 
         <FlatList
           data={users}
@@ -63,18 +64,3 @@ export default function UserListScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 15 },
-  card: {
-    padding: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    marginBottom: 10
-  },
-  name: { fontSize: 16 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" }
-});
