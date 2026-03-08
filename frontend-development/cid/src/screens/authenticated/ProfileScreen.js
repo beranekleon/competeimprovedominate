@@ -164,10 +164,14 @@ export default function ProfileScreen({ navigation }) {
 
       {/* Bottom Taskbar */}
       <TaskBar
+        onLeftPress={() => navigation.navigate('Users')}
+        leftButtonText='Friends'
+        leftButtonVisible={true}
         onCenterPress={() => navigation.navigate('Dashboard')}
-        centerButtonText="🗺"
+        centerButtonText='Map'
         centerButtonActive={false}
-        rightButtonVisible={false}
+        onRightPress={() => navigation.navigate('Profile')}
+        rightButtonVisible={true}
         loading={loading}
       />
     </View>

@@ -550,14 +550,9 @@ export default function DashboardScreen({ navigation }) {
             {
               top: Math.max(12, insets.top + 8),
               right: Math.max(12, insets.right + 12),
-              left: Math.max(12, insets.left + 12),
             },
           ]}
         >
-          <TouchableOpacity style={styles.mapControlButton} onPress={() => navigation.navigate('Users')}>
-            <Text style={styles.recenterButtonText}>Friends</Text>
-          </TouchableOpacity>
-
           <View style={styles.rightMapControls}>
             <TouchableOpacity style={styles.mapControlButton} onPress={handleShowAllTerritories}>
               <Text style={styles.recenterButtonText}>👁</Text>
@@ -573,6 +568,9 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Bottom Taskbar */}
       <TaskBar
+        onLeftPress={() => navigation.navigate('Users')}
+        leftButtonText='Friends'
+        leftButtonVisible={true}
         onCenterPress={handleStartStop}
         centerButtonText={isRunning ? 'Stop' : 'Start'}
         centerButtonActive={isRunning}
