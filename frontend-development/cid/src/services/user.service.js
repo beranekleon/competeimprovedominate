@@ -32,6 +32,16 @@ const userService = {
   },
 
   /**
+   * Fetch all recorded sessions for a user
+   * @param {string} email - User email
+   * @returns {Promise<{sessions: Array<object>}>}
+   */
+  getSessions: async (email) => {
+    const encodedEmail = encodeURIComponent((email || '').trim());
+    return api.get(`/user-sessions?email=${encodedEmail}`);
+  },
+
+  /**
    * Test connection to backend
    * @returns {Promise<object>} Status message from server
    */
