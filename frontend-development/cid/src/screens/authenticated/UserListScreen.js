@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import api from "../../services/api";
 
 export default function UserListScreen() {
@@ -36,20 +37,23 @@ export default function UserListScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>User List</Text>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <View style={styles.container}>
+        <Text style={styles.title}>User List</Text>
 
-      <FlatList
-        data={users}
-        keyExtractor={(item) => item.email}
-        renderItem={renderUser}
-      />
-    </View>
+        <FlatList
+          data={users}
+          keyExtractor={(item) => item.email}
+          renderItem={renderUser}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 15 },
   card: {
     padding: 15,
