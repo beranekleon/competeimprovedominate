@@ -12,7 +12,11 @@ import ResetPasswordScreen from '../screens/unauthenticated/ResetPasswordScreen'
 import DashboardScreen from '../screens/authenticated/DashboardScreen';
 import ProfileScreen from '../screens/authenticated/ProfileScreen';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import UserListScreen from "../screens/authenticated/UserListScreen";
+=======
+import ChangePasswordScreen from "../screens/authenticated/ResetExistentPasswort";
+>>>>>>> Stashed changes
 =======
 import ChangePasswordScreen from "../screens/authenticated/ResetExistentPasswort";
 >>>>>>> Stashed changes
