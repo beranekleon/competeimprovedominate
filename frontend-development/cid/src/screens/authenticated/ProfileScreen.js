@@ -16,7 +16,7 @@ import TaskBar from '../../components/TaskBar';
 
 /**
  * ProfileScreen
- * User profile management with cloud notes, connection test, and account deletion
+ * User profile management with cloud notes, connection test, account deletion and password change
  */
 export default function ProfileScreen({ navigation }) {
   const { userData, setUserData, logout, deleteAccount, testConnection, loading } = useAuth();

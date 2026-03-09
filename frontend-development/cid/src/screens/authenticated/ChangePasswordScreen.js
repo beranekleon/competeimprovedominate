@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    ActivityIndicator,
+    Alert,
+    StyleSheet,
+} from 'react-native';
 import { BACKEND_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -40,7 +48,7 @@ export default function ChangePasswordScreen({ navigation }) {
                 body: JSON.stringify({
                     email: email.trim(),
                     currentPassword,
-                    newPassword
+                    newPassword,
                 }),
             });
 

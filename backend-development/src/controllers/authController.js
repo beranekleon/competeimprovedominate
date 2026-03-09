@@ -3,14 +3,15 @@ const { admin, db } = require('../config/firebase');
 const { normalizeEmail, hashToken } = require('../utils/helpers');
 const twilio = require('twilio');
 
-// Twilio-Client initialisieren
+// Twilio-Client initialisieren (nur einmal)
 const twilioClient = twilio(
     process.env.TWILIO_ACCOUNT_SID,
     process.env.TWILIO_AUTH_TOKEN
 );
 
-// Email Service (bleibt wie bei dir)
+// (Optional) Email Service Logik hierhin oder in eigenen Service
 const sendResetCode = async (email, code) => {
+    // ... deine bestehende nodemailer Logik ...
     console.log(`[DEV] Passwort-Reset Code für ${email}: ${code}`);
 };
 
@@ -175,37 +176,39 @@ exports.verifyPhoneCode = async (req, res) => {
         console.error("Verify Check Fehler:", error);
         res.status(500).json({ fehler: error.message });
     }
-    exports.changePassword = async (req, res) => {
-        try {
-            const { email, currentPassword, newPassword } = req.body;
-            if (!email || !currentPassword || !newPassword) {
-                return res.status(400).json({ fehler: "Alle Felder erforderlich" });
-            }
+};
 
-            const normalizedEmail = normalizeEmail(email);
-            const userRef = db.collection('users').doc(normalizedEmail);
-            const doc = await userRef.get();
-
-            if (!doc.exists) return res.status(404).json({ fehler: "Benutzer nicht gefunden" });
-
-            const user = doc.data();
-
-            const isMatch = await bcrypt.compare(currentPassword, user.password);
-            if (!isMatch) return res.status(401).json({ fehler: "Aktuelles Passwort falsch" });
-
-            if (newPassword.length < 6) return res.status(400).json({ fehler: "Neues Passwort muss mindestens 6 Zeichen lang sein" });
-
-            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
-            await userRef.update({
-                password: hashedNewPassword,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp()
-            });
-
-            res.status(200).json({ nachricht: "Passwort erfolgreich geändert" });
-        } catch (error) {
-            console.error("Change Password Fehler:", error);
-            res.status(500).json({ fehler: "Interner Fehler" });
+// Passwort ändern (für eingeloggte User – prüft aktuelles Passwort)
+exports.changePassword = async (req, res) => {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+        if (!email || !currentPassword || !newPassword) {
+            return res.status(400).json({ fehler: "Alle Felder erforderlich" });
         }
-    };
+
+        const normalizedEmail = normalizeEmail(email);
+        const userRef = db.collection('users').doc(normalizedEmail);
+        const doc = await userRef.get();
+
+        if (!doc.exists) return res.status(404).json({ fehler: "Benutzer nicht gefunden" });
+
+        const user = doc.data();
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) return res.status(401).json({ fehler: "Aktuelles Passwort falsch" });
+
+        if (newPassword.length < 6) return res.status(400).json({ fehler: "Neues Passwort muss mindestens 6 Zeichen lang sein" });
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        await userRef.update({
+            password: hashedNewPassword,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.status(200).json({ nachricht: "Passwort erfolgreich geändert" });
+    } catch (error) {
+        console.error("Change Password Fehler:", error);
+        res.status(500).json({ fehler: "Interner Fehler" });
+    }
 };
