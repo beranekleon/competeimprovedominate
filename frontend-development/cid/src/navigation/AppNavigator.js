@@ -11,7 +11,11 @@ import RegisterScreen from '../screens/unauthenticated/RegisterScreen';
 import ResetPasswordScreen from '../screens/unauthenticated/ResetPasswordScreen';
 import DashboardScreen from '../screens/authenticated/DashboardScreen';
 import ProfileScreen from '../screens/authenticated/ProfileScreen';
+<<<<<<< Updated upstream
 import UserListScreen from "../screens/authenticated/UserListScreen";
+=======
+import ChangePasswordScreen from "../screens/authenticated/ResetExistentPasswort";
+>>>>>>> Stashed changes
 
 const Stack = createStackNavigator();
 
@@ -52,9 +56,11 @@ export function AppNavigator() {
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+              <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
           </>
         )}
       </Stack.Navigator>
+
     </NavigationContainer>
   );
 }
