@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { BACKEND_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,6 +11,7 @@ export default function ChangePasswordScreen({ navigation }) {
     const [error, setError] = useState('');
 
     const handleChangePassword = async () => {
+        // Validierung
         if (!currentPassword.trim() || !newPassword.trim() || !confirmNewPassword.trim()) {
             setError('Alle Felder ausfüllen');
             return;
@@ -47,7 +48,7 @@ export default function ChangePasswordScreen({ navigation }) {
 
             if (res.ok) {
                 Alert.alert('Erfolg', 'Passwort geändert! Bitte neu einloggen.');
-                // Optional: Logout nach Änderung
+                // Logout erzwingen
                 await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
                 navigation.navigate('Login');
             } else {
@@ -61,13 +62,13 @@ export default function ChangePasswordScreen({ navigation }) {
     };
 
     return (
-        <View style={{ flex: 1, padding: 20, justifyContent: 'center' }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Passwort ändern</Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>Passwort ändern</Text>
 
-            {error ? <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text> : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
             <TextInput
-                style={{ borderWidth: 1, padding: 12, marginBottom: 10, borderRadius: 8 }}
+                style={styles.input}
                 placeholder="Aktuelles Passwort"
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
@@ -75,7 +76,7 @@ export default function ChangePasswordScreen({ navigation }) {
             />
 
             <TextInput
-                style={{ borderWidth: 1, padding: 12, marginBottom: 10, borderRadius: 8 }}
+                style={styles.input}
                 placeholder="Neues Passwort"
                 value={newPassword}
                 onChangeText={setNewPassword}
@@ -83,7 +84,7 @@ export default function ChangePasswordScreen({ navigation }) {
             />
 
             <TextInput
-                style={{ borderWidth: 1, padding: 12, marginBottom: 20, borderRadius: 8 }}
+                style={styles.input}
                 placeholder="Neues Passwort wiederholen"
                 value={confirmNewPassword}
                 onChangeText={setConfirmNewPassword}
@@ -91,16 +92,72 @@ export default function ChangePasswordScreen({ navigation }) {
             />
 
             <TouchableOpacity
+                style={styles.button}
                 onPress={handleChangePassword}
                 disabled={loading}
-                style={{ backgroundColor: '#007AFF', padding: 15, borderRadius: 8, alignItems: 'center' }}
             >
-                {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: 'bold' }}>Passwort ändern</Text>}
+                {loading ? (
+                    <ActivityIndicator color="#fff" />
+                ) : (
+                    <Text style={styles.buttonText}>Passwort ändern</Text>
+                )}
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 20 }}>
-                <Text style={{ color: '#007AFF', textAlign: 'center' }}>Abbrechen</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancel}>
+                <Text style={styles.cancelText}>Abbrechen</Text>
             </TouchableOpacity>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        marginBottom: 30,
+        textAlign: 'center',
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginBottom: 15,
+        fontSize: 16,
+    },
+    input: {
+        width: '100%',
+        height: 50,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginVertical: 10,
+        backgroundColor: '#fafafa',
+        fontSize: 16,
+    },
+    button: {
+        backgroundColor: '#007AFF',
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    cancel: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    cancelText: {
+        color: '#007AFF',
+        fontSize: 16,
+    },
+});
