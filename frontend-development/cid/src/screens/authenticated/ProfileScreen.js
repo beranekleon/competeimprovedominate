@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Modal,
-  Alert,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 import { CommonStyles, Colors, ProfileScreenStyles } from '../../styles';
 import TaskBar from '../../components/TaskBar';
 
@@ -20,15 +21,16 @@ import TaskBar from '../../components/TaskBar';
  */
 export default function ProfileScreen({ navigation }) {
   const { userData, setUserData, logout, deleteAccount, testConnection, loading } = useAuth();
+  const { showToast } = useToast();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
 
   const handleTestConnection = async () => {
     try {
       const result = await testConnection();
-      Alert.alert('Verbindung', result);
+      showToast({ message: result, type: 'success' });
     } catch (error) {
-      Alert.alert('Fehler', 'Verbindungsfehler');
+      showToast({ message: 'Verbindungsfehler', type: 'error' });
     }
   };
 
@@ -43,8 +45,9 @@ export default function ProfileScreen({ navigation }) {
             onPress: async () => {
               try {
                 await logout();
+                showToast({ message: 'Erfolgreich abgemeldet', type: 'success' });
               } catch (error) {
-                Alert.alert('Fehler', error.message || 'Logout fehlgeschlagen');
+                showToast({ message: error.message || 'Logout fehlgeschlagen', type: 'error' });
               }
             },
           },
@@ -54,16 +57,16 @@ export default function ProfileScreen({ navigation }) {
 
   const handleDeleteConfirm = async () => {
     if (!deletePassword.trim()) {
-      Alert.alert('Fehler', 'Bitte Passwort eingeben');
+      showToast({ message: 'Bitte Passwort eingeben', type: 'error' });
       return;
     }
 
     try {
       await deleteAccount(deletePassword);
       setDeleteModalVisible(false);
-      Alert.alert('Erfolg', 'Konto erfolgreich gelöscht.');
+      showToast({ message: 'Konto erfolgreich gelöscht.', type: 'success' });
     } catch (error) {
-      Alert.alert('Fehler', error.message || 'Fehler beim Löschen');
+      showToast({ message: error.message || 'Fehler beim Löschen', type: 'error' });
       setDeletePassword('');
     }
   };

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, Button } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Button } from 'react-native';
 import { BACKEND_URL } from '@env';
+import { useToast } from '../../context/ToastContext';
 import { CommonStyles, Colors, ResetPasswordScreenStyles } from '../../styles';
 
 export default function ResetPasswordScreen({ navigation }) {
+  const { showToast } = useToast();
   const [step, setStep] = useState(1); // 1 = Code anfordern, 2 = Passwort setzen
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
@@ -21,13 +23,13 @@ export default function ResetPasswordScreen({ navigation }) {
       const json = await response.json();
 
       if (response.ok) {
-        Alert.alert("Code gesendet", json.nachricht || "Wenn das Konto existiert, wurde ein Code gesendet.");
+        showToast({ message: json.nachricht || "Wenn das Konto existiert, wurde ein Code gesendet.", type: 'success' });
         setStep(2);
       } else {
-        Alert.alert("Fehler", json.fehler || "Fehler beim Anfordern.");
+        showToast({ message: json.fehler || "Fehler beim Anfordern.", type: 'error' });
       }
     } catch (e) {
-      Alert.alert("Fehler", "Netzwerkfehler");
+      showToast({ message: "Netzwerkfehler", type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -35,7 +37,7 @@ export default function ResetPasswordScreen({ navigation }) {
 
   const resetPassword = async () => {
     if (newPassword.length < 8) {
-      Alert.alert("Fehler", "Passwort muss mindestens 8 Zeichen haben.");
+      showToast({ message: "Passwort muss mindestens 8 Zeichen haben.", type: 'error' });
       return;
     }
 
@@ -49,13 +51,13 @@ export default function ResetPasswordScreen({ navigation }) {
       const json = await response.json();
 
       if (response.ok) {
-        Alert.alert("Erfolg", "Passwort wurde geändert. Du kannst dich jetzt einloggen.");
+        showToast({ message: "Passwort wurde geändert. Du kannst dich jetzt einloggen.", type: 'success' });
         navigation.navigate('Login');
       } else {
-        Alert.alert("Fehler", json.fehler || "Zurücksetzen fehlgeschlagen.");
+        showToast({ message: json.fehler || "Zurücksetzen fehlgeschlagen.", type: 'error' });
       }
     } catch (e) {
-      Alert.alert("Fehler", "Netzwerkfehler");
+      showToast({ message: "Netzwerkfehler", type: 'error' });
     } finally {
       setLoading(false);
     }

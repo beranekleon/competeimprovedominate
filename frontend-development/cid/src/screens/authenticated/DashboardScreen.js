@@ -1,7 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 import { useGPS } from '../../hooks/useGPS';
 import { useSessionRecorder } from '../../hooks/useSessionRecorder';
 import { useTerritoryGeometry } from '../../hooks/useTerritoryGeometry';
@@ -26,14 +27,15 @@ const DEFAULT_REGION = {
 export default function DashboardScreen({ navigation }) {
 
   const { loading, userEmail } = useAuth();
+  const { showToast } = useToast();
   // const { location, errorMsg, region, isLoading: gpsLoading } = useGPS();
   const { location, errorMsg, region } = useGPS();
   const insets = useSafeAreaInsets();
   const mapRef = useRef(null);
 
   const handleSessionsFetchError = useCallback((error) => {
-    Alert.alert('Fehler', error?.message || 'Sessions konnten nicht geladen werden.');
-  }, []);
+    showToast({ message: error?.message || 'Sessions konnten nicht geladen werden.', type: 'error' });
+  }, [showToast]);
 
   const {
     sessions,
@@ -45,11 +47,8 @@ export default function DashboardScreen({ navigation }) {
   });
 
   const handleSessionSaveError = useCallback((error) => {
-    Alert.alert(
-      'Fehler',
-      error?.message || 'Session konnte nicht gespeichert werden.'
-    );
-  }, []);
+    showToast({ message: error?.message || 'Session konnte nicht gespeichert werden.', type: 'error' });
+  }, [showToast]);
 
   const {
     isRunning,

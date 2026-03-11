@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Button,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 import { CommonStyles, Colors } from '../../styles';
 
 /**
@@ -18,13 +18,14 @@ import { CommonStyles, Colors } from '../../styles';
 export default function RegisterScreen({ navigation }) {
   const { register, loading } = useAuth();
   const { login } = useAuth(); // For automatic login after registration
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
 
   const handleRegister = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Fehler', 'Email und Passwort erforderlich');
+      showToast({ message: 'Email und Passwort erforderlich', type: 'error' });
       return;
     }
 
@@ -32,9 +33,10 @@ export default function RegisterScreen({ navigation }) {
       await register(email, password, phone || null);
       // Automatically log in the user
       await login(email, password);
+      showToast({ message: 'Registrierung erfolgreich!', type: 'success' });
       // Navigation will automatically happen via AppNavigator based on isLoggedIn state
     } catch (error) {
-      Alert.alert('Fehler', error.message || 'Registrierung fehlgeschlagen');
+      showToast({ message: error.message || 'Registrierung fehlgeschlagen', type: 'error' });
     }
   };
 

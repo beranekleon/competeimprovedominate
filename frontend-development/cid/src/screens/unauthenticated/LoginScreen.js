@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, TextInput, TouchableOpacity, Button, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 import { CommonStyles, Colors } from '../../styles';
 
 export default function LoginScreen({ navigation }) {
@@ -13,7 +14,10 @@ export default function LoginScreen({ navigation }) {
     loginError,
     loading,
     setLoginError,
+    isLoggedIn,
   } = useAuth();
+  const { showToast } = useToast();
+  const didMountRef = useRef(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,8 +37,24 @@ export default function LoginScreen({ navigation }) {
         console.log("Fehler beim Laden der E-Mail:", e);
       }
     };
+
     loadSavedEmail();
+    didMountRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (!didMountRef.current) return;
+    if (loginError) {
+      showToast({ message: loginError, type: 'error' });
+    }
+  }, [loginError, showToast]);
+
+  useEffect(() => {
+    if (!didMountRef.current) return;
+    if (isLoggedIn) {
+      showToast({ message: 'Erfolgreich eingeloggt', type: 'success' });
+    }
+  }, [isLoggedIn, showToast]);
 
   const handleEmailLogin = async () => {
     if (!email.trim() || !password.trim()) {

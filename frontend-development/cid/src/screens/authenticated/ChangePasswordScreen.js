@@ -5,13 +5,14 @@ import {
     TextInput,
     TouchableOpacity,
     ActivityIndicator,
-    Alert,
     StyleSheet,
 } from 'react-native';
 import { BACKEND_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useToast } from '../../context/ToastContext';
 
 export default function ChangePasswordScreen({ navigation }) {
+    const { showToast } = useToast();
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -55,7 +56,7 @@ export default function ChangePasswordScreen({ navigation }) {
             const json = await res.json();
 
             if (res.ok) {
-                Alert.alert('Erfolg', 'Passwort geändert! Bitte neu einloggen.');
+                showToast({ message: 'Passwort geändert! Bitte neu einloggen.', type: 'success' });
                 // Logout erzwingen
                 await AsyncStorage.multiRemove(['@is_logged_in', '@user_email', '@user_text']);
                 navigation.navigate('Login');
