@@ -192,3 +192,56 @@ exports.getFriends = async (req, res) => {
         res.status(500).json({ fehler: error.message });
     }
 };
+
+exports.getLeaderboard = async (req, res) => {
+    try {
+        const snapshot = await db.collection('users').get();
+
+        const leaderboard = snapshot.docs.map((doc, index) => {
+            const data = doc.data();
+            const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+
+            const allLocations = sessions.flatMap((session) =>
+                Array.isArray(session.locations) ? session.locations : []
+            );
+
+            const uniquePoints = new Set(
+                allLocations
+                    .filter(
+                        (loc) =>
+                            loc &&
+                            typeof loc.latitude === 'number' &&
+                            typeof loc.longitude === 'number'
+                    )
+                    .map(
+                        (loc) =>
+                            `${loc.latitude.toFixed(5)}-${loc.longitude.toFixed(5)}`
+                    )
+            );
+
+            const score = uniquePoints.size;
+
+            return {
+                id: doc.id || index + 1,
+                name:
+                    data.userData?.displayName ||
+                    data.username ||
+                    data.name ||
+                    data.displayName ||
+                    doc.id,
+                score,
+                avatar:
+                    data.userData?.avatar ||
+                    data.avatar ||
+                    "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+            };
+        });
+
+        leaderboard.sort((a, b) => b.score - a.score);
+
+        res.status(200).json(leaderboard);
+    } catch (error) {
+        console.error("Leaderboard Fehler:", error);
+        res.status(500).json({ fehler: error.message });
+    }
+};

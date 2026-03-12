@@ -22,6 +22,7 @@ app.post('/verify-phone-code', authController.verifyPhoneCode);    // NEU
 app.post('/save-data', userController.saveData);
 app.post('/save-session', userController.saveSession);
 app.get('/user-sessions', userController.getSessions);
+app.get('/leaderboard', userController.getLeaderboard);
 app.post('/delete-user', userController.deleteUser);
 
 // Friends
