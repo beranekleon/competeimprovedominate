@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Button,
   ActivityIndicator,
+  Keyboard
 } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../context/ToastContext';
@@ -33,6 +34,7 @@ export default function RegisterScreen({ navigation }) {
   const [phone, setPhone] = useState('');
 
   const handleRegister = async () => {
+    Keyboard.dismiss();
     if (!email.trim() || !password.trim()) {
       showToast({ message: 'Email und Passwort erforderlich', type: 'error' });
       return;
