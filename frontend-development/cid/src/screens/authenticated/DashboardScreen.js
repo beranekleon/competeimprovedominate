@@ -25,8 +25,10 @@ const DEFAULT_REGION = {
  * Main user dashboard with map and taskbar
  */
 export default function DashboardScreen({ navigation }) {
+
   const { loading, userEmail } = useAuth();
   const { showToast } = useToast();
+
   const { location, errorMsg, region } = useGPS();
   const insets = useSafeAreaInsets();
   const mapRef = useRef(null);
@@ -115,6 +117,7 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={DashboardStyles.container}>
+
       {/* Full Screen Map */}
       <View style={DashboardStyles.mapContainer}>
         <DashboardMap
@@ -211,6 +214,7 @@ export default function DashboardScreen({ navigation }) {
         rightButtonVisible={true}
         loading={loading || recordingLoading || sessionsLoading}
       />
+
     </View>
   );
 }

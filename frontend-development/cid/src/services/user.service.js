@@ -68,6 +68,10 @@ const userService = {
   testConnection: async () => {
     return api.get('/status');
   },
+  
+  getLeaderboard: async () => {
+    return api.get('/leaderboard');
+  },
 };
 
 export default userService;

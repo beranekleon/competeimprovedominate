@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Text,
@@ -10,6 +11,14 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../context/ToastContext';
 import { CommonStyles, Colors } from '../../styles';
+
+/**
+ * Prüft, ob die E-Mail ein gültiges Format hat
+ */
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
 /**
  * RegisterScreen
@@ -26,6 +35,11 @@ export default function RegisterScreen({ navigation }) {
   const handleRegister = async () => {
     if (!email.trim() || !password.trim()) {
       showToast({ message: 'Email und Passwort erforderlich', type: 'error' });
+      return;
+    }
+
+    if (!isValidEmail(email.trim())) {
+      showToast({ message: 'Bitte eine gültige E-Mail eingeben', type: 'error' });
       return;
     }
 

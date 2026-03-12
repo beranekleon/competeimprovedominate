@@ -80,7 +80,7 @@ const authService = {
    * @returns {Promise<object>} User data and token
    */
   confirmPhoneCode: async (phone, code) => {
-    return api.post('/confirm-phone-code', {
+    return api.post('/verify-phone-code', {
       phone: phone.trim(),
       code: code.trim(),
     });

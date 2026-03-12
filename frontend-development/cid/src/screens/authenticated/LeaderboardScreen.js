@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BACKEND_URL } from "@env";
+import userService from "../../services/user.service";
 
 export default function LeaderboardScreen({ navigation }) {
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -18,8 +18,7 @@ export default function LeaderboardScreen({ navigation }) {
   useEffect(() => {
     const loadLeaderboard = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/leaderboard`);
-        const data = await response.json();
+        const data = await userService.getLeaderboard();
 
         if (Array.isArray(data)) {
           const normalizedData = data.map((item, index) => ({
