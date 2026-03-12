@@ -1,5 +1,5 @@
-import React, { useCallback, useRef } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../context/ToastContext';
@@ -25,13 +25,13 @@ const DEFAULT_REGION = {
  * Main user dashboard with map and taskbar
  */
 export default function DashboardScreen({ navigation }) {
-
   const { loading, userEmail } = useAuth();
   const { showToast } = useToast();
-  // const { location, errorMsg, region, isLoading: gpsLoading } = useGPS();
   const { location, errorMsg, region } = useGPS();
   const insets = useSafeAreaInsets();
   const mapRef = useRef(null);
+
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const handleSessionsFetchError = useCallback((error) => {
     showToast({ message: error?.message || 'Sessions konnten nicht geladen werden.', type: 'error' });
@@ -115,7 +115,6 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={DashboardStyles.container}>
-
       {/* Full Screen Map */}
       <View style={DashboardStyles.mapContainer}>
         <DashboardMap
@@ -138,21 +137,80 @@ export default function DashboardScreen({ navigation }) {
         />
       </View>
 
+      {menuVisible && (
+        <View
+          style={{
+            position: 'absolute',
+            right: 20,
+            bottom: 110,
+            backgroundColor: '#ffffff',
+            borderRadius: 14,
+            width: 170,
+            elevation: 8,
+            shadowColor: '#000',
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 3 },
+            paddingVertical: 8,
+            zIndex: 9999,
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+            }}
+            onPress={() => {
+              setMenuVisible(false);
+              navigation.navigate('Profile');
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#222',
+                fontWeight: '600',
+              }}
+            >
+              Profil
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              paddingVertical: 14,
+              paddingHorizontal: 16,
+            }}
+            onPress={() => {
+              setMenuVisible(false);
+              navigation.navigate('Leaderboard');
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#222',
+                fontWeight: '600',
+              }}
+            >
+              Leaderboard
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Bottom Taskbar */}
       <TaskBar
         onLeftPress={() => navigation.navigate('Users')}
-        leftButtonText='Friends'
+        leftButtonText="Friends"
         leftButtonVisible={true}
         onCenterPress={toggleRecording}
         centerButtonText={isRunning ? 'Stop' : 'Start'}
         centerButtonActive={isRunning}
-        onRightPress={() => navigation.navigate('Profile')}
+        onRightPress={() => setMenuVisible(!menuVisible)}
         rightButtonVisible={true}
         loading={loading || recordingLoading || sessionsLoading}
       />
-
     </View>
   );
 }
-

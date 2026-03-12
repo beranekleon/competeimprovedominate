@@ -13,6 +13,7 @@ import DashboardScreen from '../screens/authenticated/DashboardScreen';
 import ProfileScreen from '../screens/authenticated/ProfileScreen';
 import UserListScreen from "../screens/authenticated/UserListScreen";
 import ChangePasswordScreen from "../screens/authenticated/ChangePasswordScreen";  // ← passt jetzt
+import LeaderboardScreen from "../screens/authenticated/LeaderboardScreen";
 
 const Stack = createStackNavigator();
 
@@ -24,6 +25,7 @@ function AuthenticatedNavigator() {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Dashboard" component={DashboardScreen} />
+            <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Users" component={UserListScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
