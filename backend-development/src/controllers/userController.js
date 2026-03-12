@@ -132,3 +132,63 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ fehler: error.message });
     }
 };
+
+exports.addFriend = async (req, res) => {
+    try {
+        const myEmail = normalizeEmail(req.body.email);
+        const friendEmail = normalizeEmail(req.body.friendEmail);
+
+        if (myEmail === friendEmail) {
+            return res.status(400).json({ fehler: "Du kannst dich nicht selbst hinzufügen." });
+        }
+
+        // 1. Prüfen, ob der aktuelle Benutzer existiert
+        const mySnap = await db.collection('users').doc(myEmail).get();
+        if (!mySnap.exists) {
+            return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        // 2. Prüfen, ob der Freund überhaupt existiert
+        const friendSnap = await db.collection('users').doc(friendEmail).get();
+        if (!friendSnap.exists) {
+            return res.status(404).json({ fehler: "Benutzer existiert nicht." });
+        }
+
+        // 2. In der Sub-Collection 'friends' speichern
+        // Wir nutzen die Email des Freundes als Dokument-ID, um Duplikate zu vermeiden
+        const friendRef = db.collection('users').doc(myEmail).collection('friends').doc(friendEmail);
+        
+        await friendRef.set({
+            email: friendEmail,
+            displayName: friendSnap.data().userData?.displayName || "Unbekannter Sportler",
+            addedAt: admin.firestore.FieldValue.serverTimestamp(),
+            status: "accepted" // Oder "pending", falls du ein Anfragesystem willst
+        });
+
+        res.status(200).json({ nachricht: "Freund erfolgreich hinzugefügt." });
+    } catch (error) {
+        res.status(500).json({ fehler: error.message });
+    }
+};
+
+exports.getFriends = async (req, res) => {
+    try {
+        const email = normalizeEmail(req.query.email || req.body?.email);
+        if (!email) {
+            return res.status(400).json({ fehler: "E-Mail fehlt." });
+        }
+
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        const friendsSnap = await userRef.collection('friends').get();
+        const friends = friendsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        res.status(200).json({ friends });
+    } catch (error) {
+        res.status(500).json({ fehler: error.message });
+    }
+};

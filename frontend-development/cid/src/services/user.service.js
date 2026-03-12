@@ -42,6 +42,26 @@ const userService = {
   },
 
   /**
+   * Fetch the current user's friend list.
+   * @param {string} email - User email
+   * @returns {Promise<{friends: Array<object>}>}
+   */
+  getFriends: async (email) => {
+    const encodedEmail = encodeURIComponent((email || '').trim());
+    return api.get(`/friends?email=${encodedEmail}`);
+  },
+
+  /**
+   * Add a friend by email
+   * @param {string} email - User email
+   * @param {string} friendEmail - Friend's email
+   * @returns {Promise<object>} Success message
+   */
+  addFriend: async (email, friendEmail) => {
+    return api.post('/add-friend', { email, friendEmail });
+  },
+
+  /**
    * Test connection to backend
    * @returns {Promise<object>} Status message from server
    */

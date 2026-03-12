@@ -24,6 +24,15 @@ app.post('/save-session', userController.saveSession);
 app.get('/user-sessions', userController.getSessions);
 app.post('/delete-user', userController.deleteUser);
 
+// Friends
+app.post('/add-friend', userController.addFriend);
+app.get('/friends', userController.getFriends);
+
+// Fallback für unbekannte Routen (verhindert HTML 404-Antworten)
+app.use((req, res) => {
+  res.status(404).json({ fehler: "Route nicht gefunden." });
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server läuft auf Port ${PORT}`);

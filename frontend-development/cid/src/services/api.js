@@ -1,6 +1,7 @@
 ﻿import { BACKEND_URL } from '@env';
 const MANUAL_BACKEND_URL = 'https://cid-testing-228623557792.europe-west3.run.app';
-const EFFECTIVE_BACKEND_URL = MANUAL_BACKEND_URL || BACKEND_URL;
+// Allow overriding the hardcoded backend URL via env (useful for local dev)
+const EFFECTIVE_BACKEND_URL = BACKEND_URL || MANUAL_BACKEND_URL;
 
 /**
  * Base API client for all HTTP requests
@@ -8,6 +9,8 @@ const EFFECTIVE_BACKEND_URL = MANUAL_BACKEND_URL || BACKEND_URL;
  */
 class ApiClient {
   constructor(baseURL = EFFECTIVE_BACKEND_URL) {
+    // Log what backend URL is actually being used (helps debug Expo + .env issues)
+    console.log('API Base URL:', baseURL);
     this.baseURL = baseURL;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
@@ -36,10 +39,27 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseError) {
+        data = null;
+      }
 
       if (!response.ok) {
-        throw new Error(data.fehler || data.error || `HTTP ${response.status}`);
+        const errorMsg =
+          data?.fehler ||
+          data?.error ||
+          `HTTP ${response.status} ${response.statusText}`;
+
+        // Prefer structured message, but include raw body for easier debugging
+        throw new Error(`${errorMsg}${data ? '' : `: ${text}`}`);
+      }
+
+      if (!data) {
+        throw new Error(`Ungültige JSON-Antwort vom Server erhalten: ${text}`);
       }
 
       return data;

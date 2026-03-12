@@ -80,6 +80,32 @@ export const UserListScreenStyles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textPrimary,
   },
+  subtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  codeBox: {
+    width: '100%',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    borderRadius: 10,
+    backgroundColor: Colors.inputBackground,
+    marginBottom: 12,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 15,
+    marginBottom: 8,
+    color: Colors.textDark,
+  },
+  infoText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 10,
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
