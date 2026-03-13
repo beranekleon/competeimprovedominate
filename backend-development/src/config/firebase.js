@@ -2,9 +2,11 @@ const admin = require('firebase-admin');
 const { getFirestore } = require('firebase-admin/firestore');
 const path = require('path');
 
-let serviceAccount;
+// Der Pfad zu deinem Ordner 'secrets' und deiner neuen Datei
+// Wir gehen von 'src/config' zwei Ebenen hoch (../..) in den Hauptordner
+const serviceAccountPath = path.join(__dirname, '..', '..', 'secrets', 'firebase-service-account.json');
+const serviceAccount = require(serviceAccountPath);
 
-// PRÜFUNG: Sind wir in der Cloud oder Lokal?
 if (process.env.FIREBASE_CONFIG) {
     try {
         serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
@@ -21,9 +23,9 @@ if (!admin.apps.length) {
     admin.initializeApp();
 }
 
-// Deine CID-Datenbank
+// Verbindung zu deiner spezifischen CID-Datenbank
 const db = getFirestore("cid-development-database");
 
-console.log("✅ Firebase-Admin erfolgreich verbunden!");
+console.log("✅ Firebase-Admin erfolgreich mit lokalem Key verbunden!");
 
 module.exports = { admin, db };
