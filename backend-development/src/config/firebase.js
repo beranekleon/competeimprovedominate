@@ -18,9 +18,7 @@ if (process.env.FIREBASE_CONFIG) {
 }
 
 if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
+    admin.initializeApp();
 }
 
 // Deine CID-Datenbank
