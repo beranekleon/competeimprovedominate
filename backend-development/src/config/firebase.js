@@ -6,14 +6,15 @@ let serviceAccount;
 
 // PRÜFUNG: Sind wir in der Cloud oder Lokal?
 if (process.env.FIREBASE_CONFIG) {
-    // CLOUD: Wir nutzen die Variable, die du gerade in der Console gespeichert hast
-    console.log("☁️ Nutze Firebase-Konfiguration aus Umgebungsvariablen...");
-    serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
-} else {
-    // LOKAL: Wir nutzen wie gewohnt deine Datei im secrets Ordner
-    console.log("💻 Nutze lokalen Firebase-Key aus dem secrets-Ordner...");
-    const serviceAccountPath = path.join(__dirname, '..', '..', 'secrets', 'firebase-service-account.json');
-    serviceAccount = require(serviceAccountPath);
+    try {
+        serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+        console.log("☁️ Firebase Config erfolgreich geladen.");
+    } catch (err) {
+        console.error("❌ FEHLER beim Parsen von FIREBASE_CONFIG:", err.message);
+        // Falls das Parsen fehlschlägt, versuchen wir es trotzdem lokal (Backup)
+        const serviceAccountPath = path.join(__dirname, '..', '..', 'secrets', 'firebase-service-account.json');
+        serviceAccount = require(serviceAccountPath);
+    }
 }
 
 if (!admin.apps.length) {
