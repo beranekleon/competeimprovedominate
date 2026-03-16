@@ -1,29 +1,26 @@
 const admin = require('firebase-admin');
 const { getFirestore } = require('firebase-admin/firestore');
-const path = require('path');
 
 let serviceAccount;
 
-// PRÜFUNG: Sind wir in der Cloud oder Lokal?
 if (process.env.FIREBASE_CONFIG) {
-    try {
-        serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
-        console.log("☁️ Firebase Config erfolgreich geladen.");
-    } catch (err) {
-        console.error("❌ FEHLER beim Parsen von FIREBASE_CONFIG:", err.message);
-        // Falls das Parsen fehlschlägt, versuchen wir es trotzdem lokal (Backup)
-        const serviceAccountPath = path.join(__dirname, '..', '..', 'secrets', 'firebase-service-account.json');
-        serviceAccount = require(serviceAccountPath);
-    }
+    // CLOUD: Er nimmt die Daten aus der Google Cloud Variable
+    serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+} else {
+    // LOKAL: Er nimmt die Datei von deinem Laptop
+    const path = require('path');
+    // Hier nutzen wir deinen Dateinamen: firebase-service-account.json
+    const serviceAccountPath = path.join(__dirname, '..', '..', 'secrets', 'firebase-service-account.json');
+    serviceAccount = require(serviceAccountPath);
 }
 
 if (!admin.apps.length) {
-    admin.initializeApp();
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
 }
 
-// Deine CID-Datenbank
+// Nutze hier den Namen deiner Datenbank oder lass es leer für (default)
 const db = getFirestore("cid-development-database");
-
-console.log("✅ Firebase-Admin erfolgreich verbunden!");
 
 module.exports = { admin, db };
