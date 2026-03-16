@@ -64,7 +64,7 @@ export default function LeaderboardScreen({ navigation }) {
 
   const ScoreBadge = ({ score }) => (
     <View style={styles.scoreBadge}>
-      <Text style={styles.scoreIcon}>🔥</Text>
+      <Text style={styles.scoreIcon} accessible={false} importantForAccessibility="no">🔥</Text>
       <Text style={styles.scoreBadgeText}>{score}</Text>
     </View>
   );
@@ -74,7 +74,12 @@ export default function LeaderboardScreen({ navigation }) {
 
     return (
       <View style={[styles.podiumWrapper, style]}>
-        <Image source={{ uri: player.avatar }} style={styles.topAvatar} />
+        <Image
+          source={{ uri: player.avatar }}
+          style={styles.topAvatar}
+          accessibilityRole="image"
+          accessibilityLabel={`Avatar von ${player.name}`}
+        />
         <Text style={styles.topName} numberOfLines={1}>
           {player.name}
         </Text>
@@ -111,6 +116,8 @@ export default function LeaderboardScreen({ navigation }) {
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="Zurück zum Profil"
           >
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
@@ -157,7 +164,12 @@ export default function LeaderboardScreen({ navigation }) {
               <Text style={styles.rankNumber}>{index + 4}</Text>
 
               <View style={styles.userInfo}>
-                <Image source={{ uri: item.avatar }} style={styles.listAvatar} />
+                <Image
+                  source={{ uri: item.avatar }}
+                  style={styles.listAvatar}
+                  accessibilityRole="image"
+                  accessibilityLabel={`Avatar von ${item.name}`}
+                />
                 <Text style={styles.listName} numberOfLines={1}>
                   {item.name}
                 </Text>

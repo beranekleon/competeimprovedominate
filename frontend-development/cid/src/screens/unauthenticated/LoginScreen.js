@@ -24,6 +24,7 @@ export default function LoginScreen({ navigation }) {
   const [loginMode, setLoginMode] = useState('email'); // 'email' oder 'phone'
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+  const loginErrorId = 'login-error-text';
 
   // Lade gespeicherte E-Mail beim Öffnen des Screens (falls vorhanden)
   useEffect(() => {
@@ -89,7 +90,7 @@ export default function LoginScreen({ navigation }) {
 
         {loginError && (
             <View style={CommonStyles.errorBox}>
-              <Text style={CommonStyles.errorText}>{loginError}</Text>
+              <Text nativeID={loginErrorId} accessibilityRole="alert" style={CommonStyles.errorText}>{loginError}</Text>
             </View>
         )}
 
@@ -101,6 +102,8 @@ export default function LoginScreen({ navigation }) {
                 loginMode === 'email' && CommonStyles.modeButtonActive
               ]}
               onPress={() => setLoginMode('email')}
+              accessibilityRole="button"
+              accessibilityLabel="Login mit E-Mail auswählen"
           >
             <Text style={[
               CommonStyles.modeButtonText,
@@ -116,6 +119,8 @@ export default function LoginScreen({ navigation }) {
                 loginMode === 'phone' && CommonStyles.modeButtonActive
               ]}
               onPress={() => setLoginMode('phone')}
+              accessibilityRole="button"
+              accessibilityLabel="Login mit Telefonnummer auswählen"
           >
             <Text style={[
               CommonStyles.modeButtonText,
@@ -136,6 +141,8 @@ export default function LoginScreen({ navigation }) {
                   onChangeText={setEmail}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  accessibilityLabel="E-Mail Adresse"
+                  aria-describedby={loginError ? loginErrorId : undefined}
               />
 
               <TextInput
@@ -144,12 +151,16 @@ export default function LoginScreen({ navigation }) {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
+                  accessibilityLabel="Passwort"
+                  aria-describedby={loginError ? loginErrorId : undefined}
               />
 
               <TouchableOpacity
                   style={CommonStyles.loginButton}
                   onPress={handleEmailLogin}
                   disabled={loading}
+                  accessibilityRole="button"
+                  accessibilityLabel="Mit E-Mail anmelden"
               >
                 {loading ? (
                     <ActivityIndicator color={Colors.white} />
@@ -169,6 +180,8 @@ export default function LoginScreen({ navigation }) {
                   value={phone}
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
+                  accessibilityLabel="Telefonnummer"
+                  aria-describedby={loginError ? loginErrorId : undefined}
               />
 
                 {!phoneAwaitingCode ? (
@@ -176,6 +189,8 @@ export default function LoginScreen({ navigation }) {
                       style={CommonStyles.loginButton}
                     onPress={handleSendPhoneCode}
                       disabled={loading}
+                      accessibilityRole="button"
+                      accessibilityLabel="Code per SMS oder WhatsApp senden"
                   >
                     {loading ? (
                         <ActivityIndicator color={Colors.white} />
@@ -192,12 +207,16 @@ export default function LoginScreen({ navigation }) {
                         onChangeText={setCode}
                         keyboardType="number-pad"
                         maxLength={6}
+                      accessibilityLabel="Verifizierungscode"
+                      aria-describedby={loginError ? loginErrorId : undefined}
                     />
 
                     <TouchableOpacity
                         style={CommonStyles.loginButton}
                       onPress={handleConfirmPhoneLogin}
                         disabled={loading}
+                        accessibilityRole="button"
+                        accessibilityLabel="Code bestätigen und anmelden"
                     >
                       {loading ? (
                           <ActivityIndicator color={Colors.white} />
@@ -211,11 +230,21 @@ export default function LoginScreen({ navigation }) {
         )}
 
         {/* Zusätzliche Links */}
-        <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={CommonStyles.forgotBtn}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ResetPassword')}
+          style={CommonStyles.forgotBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Passwort vergessen"
+        >
           <Text style={CommonStyles.linkText}>Passwort vergessen?</Text>
         </TouchableOpacity>
 
-        <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
+        <Button
+          title="Zurück"
+          onPress={() => navigation.goBack()}
+          color={Colors.textGray}
+          accessibilityLabel="Zurück zur Startseite"
+        />
       </View>
   );
 }

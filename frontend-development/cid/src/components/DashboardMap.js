@@ -23,7 +23,11 @@ export default function DashboardMap({
       <View style={DashboardMapStyles.mapPlaceholder}>
         <ActivityIndicator size="large" color={DashboardMapTheme.loadingIndicatorColor} />
         <Text style={DashboardMapStyles.searchText}>GPS wird gesucht...</Text>
-        {errorMsg && <Text style={DashboardMapStyles.errorText}>{errorMsg}</Text>}
+        {errorMsg && (
+          <Text accessibilityRole="alert" style={DashboardMapStyles.errorText}>
+            {errorMsg}
+          </Text>
+        )}
       </View>
     );
   }
@@ -34,6 +38,7 @@ export default function DashboardMap({
       style={DashboardMapStyles.map}
       initialRegion={initialRegion}
       showsUserLocation={true}
+      accessibilityLabel="Karte mit Gebieten und Position"
     >
       {mergedTerritoryRings.map((ring, index) => (
         <Polygon
@@ -62,7 +67,13 @@ export default function DashboardMap({
         />
       )}
 
-      {location && <Marker coordinate={location} title="Deine Position" />}
+      {location && (
+        <Marker
+          coordinate={location}
+          title="Deine Position"
+          accessibilityLabel="Deine aktuelle Position"
+        />
+      )}
     </MapView>
   );
 }

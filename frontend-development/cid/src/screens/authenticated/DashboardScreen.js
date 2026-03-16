@@ -167,6 +167,8 @@ export default function DashboardScreen({ navigation }) {
               setMenuVisible(false);
               navigation.navigate('Profile');
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Profil öffnen"
           >
             <Text
               style={{
@@ -188,6 +190,8 @@ export default function DashboardScreen({ navigation }) {
               setMenuVisible(false);
               navigation.navigate('Leaderboard');
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Leaderboard öffnen"
           >
             <Text
               style={{

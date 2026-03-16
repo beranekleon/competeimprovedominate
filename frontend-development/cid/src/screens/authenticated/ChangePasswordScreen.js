@@ -18,6 +18,7 @@ export default function ChangePasswordScreen({ navigation }) {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const errorId = 'change-password-error';
 
     const handleChangePassword = async () => {
         // Validierung
@@ -74,7 +75,7 @@ export default function ChangePasswordScreen({ navigation }) {
         <View style={styles.container}>
             <Text style={styles.title}>Passwort ändern</Text>
 
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {error ? <Text nativeID={errorId} accessibilityRole="alert" style={styles.errorText}>{error}</Text> : null}
 
             <TextInput
                 style={styles.input}
@@ -82,6 +83,8 @@ export default function ChangePasswordScreen({ navigation }) {
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 secureTextEntry
+                accessibilityLabel="Aktuelles Passwort"
+                aria-describedby={error ? errorId : undefined}
             />
 
             <TextInput
@@ -90,6 +93,8 @@ export default function ChangePasswordScreen({ navigation }) {
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
+                accessibilityLabel="Neues Passwort"
+                aria-describedby={error ? errorId : undefined}
             />
 
             <TextInput
@@ -98,12 +103,16 @@ export default function ChangePasswordScreen({ navigation }) {
                 value={confirmNewPassword}
                 onChangeText={setConfirmNewPassword}
                 secureTextEntry
+                accessibilityLabel="Neues Passwort wiederholen"
+                aria-describedby={error ? errorId : undefined}
             />
 
             <TouchableOpacity
                 style={styles.button}
                 onPress={handleChangePassword}
                 disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel="Passwort ändern"
             >
                 {loading ? (
                     <ActivityIndicator color="#fff" />
@@ -112,7 +121,12 @@ export default function ChangePasswordScreen({ navigation }) {
                 )}
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancel}>
+            <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.cancel}
+                accessibilityRole="button"
+                accessibilityLabel="Abbrechen und zurück"
+            >
                 <Text style={styles.cancelText}>Abbrechen</Text>
             </TouchableOpacity>
         </View>

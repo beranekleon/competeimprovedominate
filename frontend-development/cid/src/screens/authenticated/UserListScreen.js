@@ -145,11 +145,14 @@ export default function UserListScreen({ navigation }) {
           value={friendInput}
           onChangeText={setFriendInput}
           editable={!addingFriend}
+          accessibilityLabel="E-Mail oder Einladungscode"
         />
         <TouchableOpacity
           style={CommonStyles.buttonPrimary}
           onPress={handleAddFriend}
           disabled={addingFriend}
+          accessibilityRole="button"
+          accessibilityLabel="Freund hinzufügen"
         >
           {addingFriend ? (
             <ActivityIndicator color="white" />
