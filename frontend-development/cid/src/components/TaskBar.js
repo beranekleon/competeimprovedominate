@@ -10,11 +10,14 @@ export default function TaskBar({
   onLeftPress,
   leftButtonText,
   leftButtonVisible = false,
+  leftButtonLabel,
   onCenterPress,
   centerButtonText,
   centerButtonActive,
+  centerButtonLabel,
   onRightPress,
   rightButtonVisible = true,
+  rightButtonLabel = 'Menü öffnen',
   loading = false,
 }) {
   return (
@@ -27,6 +30,8 @@ export default function TaskBar({
                 style={styles.leftButton}
                 onPress={onLeftPress}
                 disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel={leftButtonLabel || leftButtonText || 'Linke Aktion'}
               >
                 <Text style={styles.leftButtonText}>{leftButtonText}</Text>
               </TouchableOpacity>
@@ -38,6 +43,8 @@ export default function TaskBar({
               style={[styles.centerButton, centerButtonActive && styles.centerButtonActive]}
               onPress={onCenterPress}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel={centerButtonLabel || centerButtonText || 'Mittlere Aktion'}
             >
               {loading ? (
                 <ActivityIndicator color="white" />
@@ -55,6 +62,8 @@ export default function TaskBar({
                 style={styles.rightButton}
                 onPress={onRightPress}
                 disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel={rightButtonLabel}
               >
                 <Text style={styles.rightButtonText}>☰</Text>
               </TouchableOpacity>

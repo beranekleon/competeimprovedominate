@@ -68,6 +68,8 @@ export default function Toast({ visible, message, type = 'info', onHide }) {
   return (
     <View pointerEvents="none" style={styles.wrapper}>
       <Animated.View
+        accessibilityRole="alert"
+        accessibilityLiveRegion="polite"
         style={[
           styles.toast,
           { backgroundColor: theme.backgroundColor },

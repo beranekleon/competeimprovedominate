@@ -82,14 +82,30 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Content */}
         <ScrollView style={ProfileScreenStyles.scrollContainer}>
+<<<<<<< HEAD
 
 
+=======
+          {/* Cloud Notes Section */}
+          <Text style={ProfileScreenStyles.sectionTitle}>Cloud-Notizen</Text>
+          <TextInput
+              style={CommonStyles.multilineInput}
+              value={userData}
+              onChangeText={setUserData}
+              multiline
+              editable={!loading}
+              placeholder="Deine Notizen..."
+              accessibilityLabel="Cloud Notizen"
+          />
+>>>>>>> 017a551ebca9193573e84857402533d6a1c6214b
 
           {/* Test Connection Button */}
           <TouchableOpacity
               style={[CommonStyles.buttonSecondary, ProfileScreenStyles.testButton]}
               onPress={handleTestConnection}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel="Verbindung testen"
           >
             {loading ? (
                 <ActivityIndicator color={Colors.white} />
@@ -103,6 +119,8 @@ export default function ProfileScreen({ navigation }) {
               style={[CommonStyles.buttonSecondary, { backgroundColor: '#007AFF', marginTop: 15 }]}
               onPress={() => navigation.navigate('ChangePassword')}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel="Passwort ändern"
           >
             {loading ? (
                 <ActivityIndicator color={Colors.white} />
@@ -116,6 +134,8 @@ export default function ProfileScreen({ navigation }) {
               style={[CommonStyles.buttonSecondary, ProfileScreenStyles.logoutButton]}
               onPress={handleLogout}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel="Logout und Speichern"
           >
             {loading ? (
                 <ActivityIndicator color={Colors.white} />
@@ -129,6 +149,8 @@ export default function ProfileScreen({ navigation }) {
               style={CommonStyles.deleteAccountButton}
               onPress={() => setDeleteModalVisible(true)}
               disabled={loading}
+              accessibilityRole="button"
+              accessibilityLabel="Konto unwiderruflich löschen"
           >
             <Text style={CommonStyles.deleteButtonText}>Konto unwiderruflich löschen</Text>
           </TouchableOpacity>
@@ -146,6 +168,7 @@ export default function ProfileScreen({ navigation }) {
                   value={deletePassword}
                   onChangeText={setDeletePassword}
                   editable={!loading}
+                  accessibilityLabel="Passwort zur Kontolöschung"
               />
               <View style={ProfileScreenStyles.modalActionsRow}>
                 <TouchableOpacity
@@ -154,10 +177,17 @@ export default function ProfileScreen({ navigation }) {
                       setDeletePassword('');
                     }}
                     disabled={loading}
+                    accessibilityRole="button"
+                    accessibilityLabel="Kontolöschung abbrechen"
                 >
                   <Text style={ProfileScreenStyles.modalCancelText}>Abbrechen</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleDeleteConfirm} disabled={loading}>
+                <TouchableOpacity
+                  onPress={handleDeleteConfirm}
+                  disabled={loading}
+                  accessibilityRole="button"
+                  accessibilityLabel="Kontolöschung bestätigen"
+                >
                   {loading ? (
                       <ActivityIndicator color={Colors.red} />
                   ) : (

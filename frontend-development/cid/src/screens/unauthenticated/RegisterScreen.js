@@ -68,6 +68,7 @@ export default function RegisterScreen({ navigation }) {
         autoCapitalize="none"
         keyboardType="email-address"
         editable={!loading}
+        accessibilityLabel="E-Mail Adresse"
       />
 
       <TextInput
@@ -77,6 +78,7 @@ export default function RegisterScreen({ navigation }) {
         onChangeText={setPassword}
         secureTextEntry
         editable={!loading}
+        accessibilityLabel="Passwort"
       />
 
       <TextInput
@@ -86,12 +88,15 @@ export default function RegisterScreen({ navigation }) {
         onChangeText={setPhone}
         keyboardType="phone-pad"
         editable={!loading}
+        accessibilityLabel="Telefonnummer optional"
       />
 
       <TouchableOpacity
         style={CommonStyles.buttonPrimary}
         onPress={handleRegister}
         disabled={loading}
+        accessibilityRole="button"
+        accessibilityLabel="Konto erstellen"
       >
         {loading ? (
           <ActivityIndicator color={Colors.white} />
@@ -100,7 +105,12 @@ export default function RegisterScreen({ navigation }) {
         )}
       </TouchableOpacity>
 
-      <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
+      <Button
+        title="Zurück"
+        onPress={() => navigation.goBack()}
+        color={Colors.textGray}
+        accessibilityLabel="Zurück zur Startseite"
+      />
     </View>
   );
 }

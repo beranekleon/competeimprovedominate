@@ -74,14 +74,26 @@ export default function ResetPasswordScreen({ navigation }) {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        accessibilityLabel="E-Mail Adresse"
       />
 
       {step === 1 ? (
         <>
-          <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={requestCode} disabled={loading}>
+          <TouchableOpacity
+            style={CommonStyles.buttonPrimary}
+            onPress={requestCode}
+            disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel="Code anfordern"
+          >
             {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={CommonStyles.buttonText}>Code anfordern</Text>}
           </TouchableOpacity>
-          <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
+          <Button
+            title="Zurück"
+            onPress={() => navigation.goBack()}
+            color={Colors.textGray}
+            accessibilityLabel="Zurück zum Login"
+          />
         </>
       ) : (
         <>
@@ -91,6 +103,7 @@ export default function ResetPasswordScreen({ navigation }) {
             value={code}
             onChangeText={setCode}
             keyboardType="number-pad"
+            accessibilityLabel="Sechsstelliger Bestätigungscode"
           />
           <TextInput
             style={CommonStyles.input}
@@ -98,18 +111,35 @@ export default function ResetPasswordScreen({ navigation }) {
             value={newPassword}
             onChangeText={setNewPassword}
             secureTextEntry
+            accessibilityLabel="Neues Passwort"
           />
 
-          <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={resetPassword} disabled={loading}>
+          <TouchableOpacity
+            style={CommonStyles.buttonPrimary}
+            onPress={resetPassword}
+            disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel="Passwort setzen"
+          >
             {loading ? <ActivityIndicator color={Colors.white} /> : <Text style={CommonStyles.buttonText}>Passwort setzen</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setStep(1)} style={CommonStyles.forgotBtn}>
+          <TouchableOpacity
+            onPress={() => setStep(1)}
+            style={CommonStyles.forgotBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Neuen Code anfordern"
+          >
             <Text style={CommonStyles.linkText}>Neuen Code anfordern</Text>
           </TouchableOpacity>
 
           <View style={ResetPasswordScreenStyles.backButtonContainer}>
-            <Button title="Zurück" onPress={() => navigation.goBack()} color={Colors.textGray} />
+            <Button
+              title="Zurück"
+              onPress={() => navigation.goBack()}
+              color={Colors.textGray}
+              accessibilityLabel="Zurück zum Login"
+            />
           </View>
         </>
       )}
