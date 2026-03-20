@@ -155,7 +155,7 @@ exports.addFriend = async (req, res) => {
         }
 
         // 2. In der Sub-Collection 'friends' speichern
-        // Wir nutzen die Email des Freundes als Dokument-ID, um Duplikate zu vermeiden
+        // Wir nutzen die E-mail des Freundes als Dokument-ID, um Duplikate zu vermeiden
         const friendRef = db.collection('users').doc(myEmail).collection('friends').doc(friendEmail);
         
         await friendRef.set({
