@@ -82,22 +82,10 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Content */}
         <ScrollView style={ProfileScreenStyles.scrollContainer}>
-<<<<<<< HEAD
 
 
-=======
-          {/* Cloud Notes Section */}
-          <Text style={ProfileScreenStyles.sectionTitle}>Cloud-Notizen</Text>
-          <TextInput
-              style={CommonStyles.multilineInput}
-              value={userData}
-              onChangeText={setUserData}
-              multiline
-              editable={!loading}
-              placeholder="Deine Notizen..."
-              accessibilityLabel="Cloud Notizen"
-          />
->>>>>>> 017a551ebca9193573e84857402533d6a1c6214b
+
+
 
           {/* Test Connection Button */}
           <TouchableOpacity
