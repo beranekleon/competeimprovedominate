@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { admin, db } = require('../config/firebase');
 const { normalizeEmail } = require('../utils/helpers');
+const { recalculateFullTerritory } = require('../utils/territory');
 
 const sanitizeAndDedupeLocations = (rawLocations) => {
     const points = Array.isArray(rawLocations) ? rawLocations : [];
@@ -66,19 +67,31 @@ exports.saveSession = async (req, res) => {
             return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
         }
 
+        const data = doc.data();
+        const currentSessions = Array.isArray(data.sessions) ? data.sessions : [];
+
+        const newSession = {
+            startedAt: session.startedAt,
+            stoppedAt: session.stoppedAt,
+            durationMs: session.durationMs,
+            durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
+            locations,
+            savedAt: admin.firestore.Timestamp.now(),
+        };
+
+        const updatedSessions = [...currentSessions, newSession];
+
+        // Recalculate territory area
+        const { mergedTerritory, totalArea } = recalculateFullTerritory(updatedSessions);
+
         await userRef.update({
-            sessions: admin.firestore.FieldValue.arrayUnion({
-                startedAt: session.startedAt,
-                stoppedAt: session.stoppedAt,
-                durationMs: session.durationMs,
-                durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
-                locations,
-                savedAt: admin.firestore.Timestamp.now(),
-            }),
+            sessions: updatedSessions,
+            totalArea: totalArea || 0,
+            mergedTerritory: mergedTerritory ? JSON.stringify(mergedTerritory) : null,
             lastUpdate: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        res.status(200).json({ nachricht: "Session gespeichert." });
+        res.status(200).json({ nachricht: "Session gespeichert.", totalArea });
     } catch (error) {
         res.status(500).json({ fehler: error.message });
     }
@@ -199,27 +212,9 @@ exports.getLeaderboard = async (req, res) => {
 
         const leaderboard = snapshot.docs.map((doc, index) => {
             const data = doc.data();
-            const sessions = Array.isArray(data.sessions) ? data.sessions : [];
-
-            const allLocations = sessions.flatMap((session) =>
-                Array.isArray(session.locations) ? session.locations : []
-            );
-
-            const uniquePoints = new Set(
-                allLocations
-                    .filter(
-                        (loc) =>
-                            loc &&
-                            typeof loc.latitude === 'number' &&
-                            typeof loc.longitude === 'number'
-                    )
-                    .map(
-                        (loc) =>
-                            `${loc.latitude.toFixed(5)}-${loc.longitude.toFixed(5)}`
-                    )
-            );
-
-            const score = uniquePoints.size;
+            
+            // Use pre-calculated totalArea, fallback to 0
+            const score = Math.round(data.totalArea || 0);
 
             return {
                 id: doc.id || index + 1,

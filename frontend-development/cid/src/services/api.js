@@ -1,6 +1,6 @@
 ﻿import { BACKEND_URL } from '@env';
 console.log('ENV BACKEND_URL:', BACKEND_URL);
-const MANUAL_BACKEND_URL = 'https://cid-testing-228623557792.europe-west3.run.app';
+const MANUAL_BACKEND_URL = 'http://192.168.1.54:8080';
 // Allow overriding the hardcoded backend URL via env (useful for local dev)
 const EFFECTIVE_BACKEND_URL = BACKEND_URL || MANUAL_BACKEND_URL;
 
@@ -91,6 +91,7 @@ class ApiClient {
 
 // Export singleton instance
 export default new ApiClient();
+
 
 
 
