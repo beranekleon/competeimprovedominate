@@ -195,7 +195,6 @@ export default function ProfileScreen({ navigation }) {
             onCenterPress={() => navigation.navigate('Dashboard')}
             centerButtonText='Map'
             centerButtonActive={false}
-            onRightPress={() => navigation.navigate('Profile')}
             rightButtonVisible={true}
             loading={loading}
         />

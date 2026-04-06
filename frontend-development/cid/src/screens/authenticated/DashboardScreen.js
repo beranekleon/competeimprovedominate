@@ -33,8 +33,6 @@ export default function DashboardScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const mapRef = useRef(null);
 
-  const [menuVisible, setMenuVisible] = useState(false);
-
   const handleSessionsFetchError = useCallback((error) => {
     showToast({ message: error?.message || 'Sessions konnten nicht geladen werden.', type: 'error' });
   }, [showToast]);
@@ -140,72 +138,6 @@ export default function DashboardScreen({ navigation }) {
         />
       </View>
 
-      {menuVisible && (
-        <View
-          style={{
-            position: 'absolute',
-            right: 20,
-            bottom: 110,
-            backgroundColor: '#ffffff',
-            borderRadius: 14,
-            width: 170,
-            elevation: 8,
-            shadowColor: '#000',
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 3 },
-            paddingVertical: 8,
-            zIndex: 9999,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-            }}
-            onPress={() => {
-              setMenuVisible(false);
-              navigation.navigate('Profile');
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Profil öffnen"
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                color: '#222',
-                fontWeight: '600',
-              }}
-            >
-              Profil
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              paddingVertical: 14,
-              paddingHorizontal: 16,
-            }}
-            onPress={() => {
-              setMenuVisible(false);
-              navigation.navigate('Leaderboard');
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Leaderboard öffnen"
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                color: '#222',
-                fontWeight: '600',
-              }}
-            >
-              Leaderboard
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
       {/* Bottom Taskbar */}
       <TaskBar
         onLeftPress={() => navigation.navigate('Users')}
@@ -214,7 +146,6 @@ export default function DashboardScreen({ navigation }) {
         onCenterPress={toggleRecording}
         centerButtonText={isRunning ? 'Stop' : 'Start'}
         centerButtonActive={isRunning}
-        onRightPress={() => setMenuVisible(!menuVisible)}
         rightButtonVisible={true}
         loading={loading || recordingLoading || sessionsLoading}
       />
