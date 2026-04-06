@@ -140,7 +140,7 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Bottom Taskbar */}
       <TaskBar
-        onLeftPress={() => navigation.navigate('Users')}
+        onLeftPress={() => navigation.navigate('Friends')}
         leftButtonText="Friends"
         leftButtonVisible={true}
         onCenterPress={toggleRecording}

@@ -12,9 +12,9 @@ import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../context/ToastContext";
 import userService from "../../services/user.service";
 import TaskBar from "../../components/TaskBar";
-import { CommonStyles, UserListScreenStyles } from "../../styles";
+import { CommonStyles, FriendsScreenStyles } from "../../styles";
 
-export default function UserListScreen({ navigation }) {
+export default function FriendsScreen({ navigation }) {
   const { userEmail } = useAuth();
   const { showToast } = useToast();
 
@@ -109,33 +109,33 @@ export default function UserListScreen({ navigation }) {
   };
 
   const renderFriend = ({ item }) => (
-    <View style={UserListScreenStyles.card}>
-      <Text style={UserListScreenStyles.name}>{item.displayName || item.email}</Text>
-      {item.email ? <Text style={UserListScreenStyles.subtitle}>{item.email}</Text> : null}
+    <View style={FriendsScreenStyles.card}>
+      <Text style={FriendsScreenStyles.name}>{item.displayName || item.email}</Text>
+      {item.email ? <Text style={FriendsScreenStyles.subtitle}>{item.email}</Text> : null}
     </View>
   );
 
   if (loading) {
     return (
-      <View style={UserListScreenStyles.center}>
+      <View style={FriendsScreenStyles.center}>
         <ActivityIndicator />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={UserListScreenStyles.safeArea} edges={["top", "left", "right"]}>
-      <View style={UserListScreenStyles.container}>
-        <Text style={UserListScreenStyles.title}>Freunde</Text>
+    <SafeAreaView style={FriendsScreenStyles.safeArea} edges={["top", "left", "right"]}>
+      <View style={FriendsScreenStyles.container}>
+        <Text style={FriendsScreenStyles.title}>Freunde</Text>
 
-        <Text style={UserListScreenStyles.sectionLabel}>Einladungs-Code</Text>
-        <Text selectable style={UserListScreenStyles.codeBox}>
+        <Text style={FriendsScreenStyles.sectionLabel}>Einladungs-Code</Text>
+        <Text selectable style={FriendsScreenStyles.codeBox}>
           {inviteCode}
         </Text>
-        <Text selectable style={[UserListScreenStyles.codeBox, { marginBottom: 8 }]}> 
+        <Text selectable style={[FriendsScreenStyles.codeBox, { marginBottom: 8 }]}> 
           {shareLink}
         </Text>
-        <Text style={UserListScreenStyles.infoText}>
+        <Text style={FriendsScreenStyles.infoText}>
           Teile den Code oder Link mit einem Freund. Er kann ihn hier einfügen (auch als Link mit „code=...“).
         </Text>
 
@@ -161,9 +161,9 @@ export default function UserListScreen({ navigation }) {
           )}
         </TouchableOpacity>
 
-        <Text style={UserListScreenStyles.sectionLabel}>Aktuelle Freunde</Text>
+        <Text style={FriendsScreenStyles.sectionLabel}>Aktuelle Freunde</Text>
         {friends.length === 0 ? (
-          <Text style={UserListScreenStyles.infoText}>Du hast noch keine Freunde hinzugefügt.</Text>
+          <Text style={FriendsScreenStyles.infoText}>Du hast noch keine Freunde hinzugefügt.</Text>
         ) : (
           <FlatList
             data={friends}
@@ -174,7 +174,7 @@ export default function UserListScreen({ navigation }) {
       </View>
 
       <TaskBar
-        onLeftPress={() => navigation.navigate("Users")}
+        onLeftPress={() => navigation.navigate("Friends")}
         leftButtonText="Friends"
         leftButtonVisible={true}
         onCenterPress={() => navigation.navigate("Dashboard")}
