@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import userService from '../../services/user.service';
 import DashboardMap from '../../components/DashboardMap';
+import MapControls from '../../components/MapControls';
 import { toMapPolygonRings } from '../../utils/territory.utils';
 import { useToast } from '../../context/ToastContext';
 
@@ -19,6 +20,8 @@ import { useToast } from '../../context/ToastContext';
 export default function FriendTerritoryScreen({ route, navigation }) {
   const { friendEmail, friendName } = route.params;
   const { showToast } = useToast();
+  const insets = useSafeAreaInsets();
+  const mapRef = useRef(null);
 
   const [territoryData, setTerritoryData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -78,6 +81,21 @@ export default function FriendTerritoryScreen({ route, navigation }) {
     };
   }, [mergedTerritoryRings]);
 
+  const handleRecenter = useCallback(() => {
+    if (!mapRef.current) return;
+    mapRef.current.animateToRegion(initialRegion, 350);
+  }, [initialRegion]);
+
+  const handleShowAll = useCallback(() => {
+    if (!mapRef.current || mergedTerritoryRings.length === 0) return;
+    
+    const allCoords = mergedTerritoryRings.flat();
+    mapRef.current.fitToCoordinates(allCoords, {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+      animated: true,
+    });
+  }, [mergedTerritoryRings]);
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -113,6 +131,7 @@ export default function FriendTerritoryScreen({ route, navigation }) {
 
       <View style={styles.mapWrapper}>
         <DashboardMap
+          mapRef={mapRef}
           initialRegion={initialRegion}
           canRenderMap={true}
           mergedTerritoryRings={mergedTerritoryRings}
@@ -120,6 +139,13 @@ export default function FriendTerritoryScreen({ route, navigation }) {
           isRunning={false}
           liveTrack={[]}
           location={null}
+        />
+
+        <MapControls
+          top={20}
+          right={20}
+          onShowAllPress={handleShowAll}
+          onRecenterPress={handleRecenter}
         />
       </View>
     </SafeAreaView>
