@@ -1,17 +1,22 @@
 ﻿import { BACKEND_URL } from '@env';
-console.log('ENV BACKEND_URL:', BACKEND_URL);
+
+// MANUAL_BACKEND_URL is updated by scripts/set-backend-url.ps1
 const MANUAL_BACKEND_URL = 'http://192.168.1.54:8080';
-// Allow overriding the hardcoded backend URL via env (useful for local dev)
-const EFFECTIVE_BACKEND_URL = BACKEND_URL || MANUAL_BACKEND_URL;
+
+// Prioritize the manual URL (set via script) over the .env value for easier local testing
+const EFFECTIVE_BACKEND_URL = MANUAL_BACKEND_URL || BACKEND_URL;
+
+console.log('--- API CONFIGURATION ---');
+console.log('ENV BACKEND_URL:', BACKEND_URL);
+console.log('MANUAL_BACKEND_URL:', MANUAL_BACKEND_URL);
+console.log('EFFECTIVE URL:', EFFECTIVE_BACKEND_URL);
+console.log('-------------------------');
 
 /**
  * Base API client for all HTTP requests
- * Handles common fetch logic, error handling, and response parsing
  */
 class ApiClient {
   constructor(baseURL = EFFECTIVE_BACKEND_URL) {
-    // Log what backend URL is actually being used (helps debug Expo + .env issues)
-    console.log('API Base URL:', baseURL);
     this.baseURL = baseURL;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
@@ -28,6 +33,7 @@ class ApiClient {
    */
   async request(endpoint, method = 'GET', body = null) {
     const url = `${this.baseURL}${endpoint}`;
+    console.log(`[API] ${method} ${url}`);
     
     const config = {
       method,
@@ -91,6 +97,16 @@ class ApiClient {
 
 // Export singleton instance
 export default new ApiClient();
+
+
+
+
+
+
+
+
+
+
 
 
 

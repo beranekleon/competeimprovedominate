@@ -109,10 +109,16 @@ export default function FriendsScreen({ navigation }) {
   };
 
   const renderFriend = ({ item }) => (
-    <View style={FriendsScreenStyles.card}>
+    <TouchableOpacity
+      style={FriendsScreenStyles.card}
+      onPress={() => navigation.navigate('FriendTerritory', {
+        friendEmail: item.email,
+        friendName: item.displayName
+      })}
+    >
       <Text style={FriendsScreenStyles.name}>{item.displayName || item.email}</Text>
       {item.email ? <Text style={FriendsScreenStyles.subtitle}>{item.email}</Text> : null}
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {

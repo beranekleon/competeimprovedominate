@@ -206,6 +206,38 @@ exports.getFriends = async (req, res) => {
     }
 };
 
+exports.getUserTerritory = async (req, res) => {
+    try {
+        const email = normalizeEmail(req.query.email);
+        console.log("Fetching territory for email:", email);
+        
+        if (!email) {
+            return res.status(400).json({ fehler: "E-Mail fehlt." });
+        }
+
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+            console.log("User not found in Firestore:", email);
+            return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        const data = doc.data();
+        console.log("Successfully fetched data for:", email, "Area:", data.totalArea);
+        
+        res.status(200).json({
+            email: doc.id,
+            totalArea: data.totalArea || 0,
+            mergedTerritory: data.mergedTerritory || null,
+            displayName: data.userData?.displayName || data.username || data.name || doc.id
+        });
+    } catch (error) {
+        console.error("Error in getUserTerritory:", error.message);
+        res.status(500).json({ fehler: error.message });
+    }
+};
+
 exports.getLeaderboard = async (req, res) => {
     try {
         const snapshot = await db.collection('users').get();

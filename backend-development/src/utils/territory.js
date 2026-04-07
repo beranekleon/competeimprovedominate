@@ -226,7 +226,7 @@ const buildExpansionFeatureFromTrack = (track, territoryRings, thresholdMeters) 
     }
 
     const forwardBoundary = buildRingPath(ring, endIdx, startIdx, true);
-    const backwardBoundary = backwardBoundary = buildRingPath(ring, endIdx, startIdx, false);
+    const backwardBoundary = buildRingPath(ring, endIdx, startIdx, false);
     const chosenBoundary = pathLengthMeters(forwardBoundary) <= pathLengthMeters(backwardBoundary)
       ? forwardBoundary
       : backwardBoundary;
@@ -255,6 +255,53 @@ const simplifyFeature = (feature, tolerance = 0.00001) => {
     return turf.simplify(feature, { tolerance, highPrecision: true });
 };
 
+const recalculateFullTerritory = (sessions) => {
+    const sessionTracks = sessions
+        .map((session) => toCoordinateTrack(session.locations))
+        .filter((track) => track.length >= 2);
+
+    const closedTrackFeatures = sessionTracks
+        .filter((track) => isClosedTrack(track, TERRITORY_CLOSURE_DISTANCE_METERS))
+        .map((track) => toPolygonFeature(track))
+        .filter(Boolean);
+
+    let merged = mergePolygonFeatures(closedTrackFeatures);
+
+    if (!merged) {
+        return { mergedTerritory: null, totalArea: 0 };
+    }
+
+    const openTracks = sessionTracks.filter(
+        (track) => !isClosedTrack(track, TERRITORY_CLOSURE_DISTANCE_METERS) && track.length >= 3
+    );
+
+    for (let i = 0; i < openTracks.length; i += 1) {
+        const territoryRings = toMapPolygonRings(merged);
+        const expansionFeature = buildExpansionFeatureFromTrack(
+            openTracks[i],
+            territoryRings,
+            TERRITORY_CLOSURE_DISTANCE_METERS
+        );
+
+        if (!expansionFeature) {
+            continue;
+        }
+
+        const expanded = mergePolygonFeatures([merged, expansionFeature]);
+        if (expanded) {
+            merged = expanded;
+        }
+    }
+
+    // Simplify to keep document size manageable
+    const simplified = simplifyFeature(merged);
+
+    return {
+        mergedTerritory: simplified ? simplified.geometry : null,
+        totalArea: calculateAreaM2(simplified)
+    };
+};
+
 module.exports = {
   isValidCoordinate,
   toCoordinateTrack,
@@ -266,5 +313,6 @@ module.exports = {
   buildExpansionFeatureFromTrack,
   calculateAreaM2,
   simplifyFeature,
+  recalculateFullTerritory,
   TERRITORY_CLOSURE_DISTANCE_METERS
 };
