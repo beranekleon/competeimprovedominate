@@ -1,4 +1,4 @@
-# CID - Compete. Improve. Dominate
+# CID - Compete. Improve. Dominate.
 
 ## Project Overview
 This repository contains the complete codebase for our (see contributors) practise diploma project in a monorepo.
