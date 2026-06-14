@@ -1,7 +1,7 @@
 # CID - Compete. Improve. Dominate
 
 ## Project Overview
-This repository contains the complete codebase for our practise diploma project in a monorepo.
+This repository contains the complete codebase for our (see contributors) practise diploma project in a monorepo.
 
 ## The Goal
 We aim to create an app that makes it easy for users to stay active and exercise by:
