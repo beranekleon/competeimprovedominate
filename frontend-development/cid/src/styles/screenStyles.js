@@ -52,7 +52,7 @@ export const ProfileScreenStyles = StyleSheet.create({
   },
 });
 
-export const UserListScreenStyles = StyleSheet.create({
+export const FriendsScreenStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: Colors.background,

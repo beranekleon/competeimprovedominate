@@ -52,6 +52,16 @@ const userService = {
   },
 
   /**
+   * Fetch a user's territory (area + GeoJSON)
+   * @param {string} email - User email
+   * @returns {Promise<{mergedTerritory: string, totalArea: number, displayName: string}>}
+   */
+  getUserTerritory: async (email) => {
+    const encodedEmail = encodeURIComponent((email || '').trim());
+    return api.get(`/user-territory?email=${encodedEmail}`);
+  },
+
+  /**
    * Add a friend by email
    * @param {string} email - User email
    * @param {string} friendEmail - Friend's email

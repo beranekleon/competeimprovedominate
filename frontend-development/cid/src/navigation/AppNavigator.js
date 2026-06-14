@@ -11,7 +11,8 @@ import RegisterScreen from '../screens/unauthenticated/RegisterScreen';
 import ResetPasswordScreen from '../screens/unauthenticated/ResetPasswordScreen';
 import DashboardScreen from '../screens/authenticated/DashboardScreen';
 import ProfileScreen from '../screens/authenticated/ProfileScreen';
-import UserListScreen from "../screens/authenticated/UserListScreen";
+import FriendsScreen from "../screens/authenticated/FriendsScreen";
+import FriendTerritoryScreen from "../screens/authenticated/FriendTerritoryScreen";
 import ChangePasswordScreen from "../screens/authenticated/ChangePasswordScreen";  // ← passt jetzt
 import LeaderboardScreen from "../screens/authenticated/LeaderboardScreen";
 
@@ -27,7 +28,8 @@ function AuthenticatedNavigator() {
             <Stack.Screen name="Dashboard" component={DashboardScreen} />
             <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Users" component={UserListScreen} />
+            <Stack.Screen name="Friends" component={FriendsScreen} />
+            <Stack.Screen name="FriendTerritory" component={FriendTerritoryScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
         </Stack.Navigator>
     );

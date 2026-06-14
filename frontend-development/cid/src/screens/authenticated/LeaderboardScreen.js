@@ -64,8 +64,7 @@ export default function LeaderboardScreen({ navigation }) {
 
   const ScoreBadge = ({ score }) => (
     <View style={styles.scoreBadge}>
-      <Text style={styles.scoreIcon} accessible={false} importantForAccessibility="no">🔥</Text>
-      <Text style={styles.scoreBadgeText}>{score}</Text>
+      <Text style={styles.scoreBadgeText}>{score} m²</Text>
     </View>
   );
 

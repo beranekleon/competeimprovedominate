@@ -106,7 +106,7 @@ Shared dashboard-related styles and map theme constants:
 ### `screenStyles.js`
 Shared screen-specific styles that do not fit generic common patterns:
 - `ProfileScreenStyles`
-- `UserListScreenStyles`
+- `FriendsScreenStyles`
 - `ResetPasswordScreenStyles`
 
 ### `taskbar.js`

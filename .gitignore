@@ -47,3 +47,6 @@ yarn-error.*
 # local backend secrets
 backend-development/.env.local
 backend-development/secrets/
+
+# Scripts runtime storage
+scripts/.runtime

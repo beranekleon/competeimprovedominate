@@ -33,11 +33,18 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+$forceFreshBuild = Read-Host "Möchtest du einen sauberen Build erzwingen? (j/N)"
+
 if (-not (Test-Path -LiteralPath $runtimeDir)) {
     New-Item -ItemType Directory -Path $runtimeDir | Out-Null
 }
 
-$backendCmd = "cd /d `"$backendDir`" && docker compose -f `"$composeFile`" up --build"
+$backendCmd = if ($forceFreshBuild -eq 'j' -or $forceFreshBuild -eq 'y') {
+    "cd /d `"$backendDir`" && docker compose -f `"$composeFile`" build --no-cache && docker compose -f `"$composeFile`" up"
+} else {
+    "cd /d `"$backendDir`" && docker compose -f `"$composeFile`" up --build"
+}
+
 $frontendCmd = "cd /d `"$frontendDir`" && npx expo start -c"
 
 $backendProc = Start-Process -FilePath "cmd.exe" -ArgumentList "/k", $backendCmd -WorkingDirectory $backendDir -PassThru

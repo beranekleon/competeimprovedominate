@@ -13,7 +13,7 @@ export {
 } from './dashboard';
 export {
 	ProfileScreenStyles,
-	UserListScreenStyles,
+	FriendsScreenStyles,
 	ResetPasswordScreenStyles,
 } from './screenStyles';
 export { TaskBarStyles } from './taskbar';

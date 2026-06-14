@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { admin, db } = require('../config/firebase');
 const { normalizeEmail } = require('../utils/helpers');
+const { recalculateFullTerritory } = require('../utils/territory');
 
 const sanitizeAndDedupeLocations = (rawLocations) => {
     const points = Array.isArray(rawLocations) ? rawLocations : [];
@@ -66,19 +67,31 @@ exports.saveSession = async (req, res) => {
             return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
         }
 
+        const data = doc.data();
+        const currentSessions = Array.isArray(data.sessions) ? data.sessions : [];
+
+        const newSession = {
+            startedAt: session.startedAt,
+            stoppedAt: session.stoppedAt,
+            durationMs: session.durationMs,
+            durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
+            locations,
+            savedAt: admin.firestore.Timestamp.now(),
+        };
+
+        const updatedSessions = [...currentSessions, newSession];
+
+        // Recalculate territory area
+        const { mergedTerritory, totalArea } = recalculateFullTerritory(updatedSessions);
+
         await userRef.update({
-            sessions: admin.firestore.FieldValue.arrayUnion({
-                startedAt: session.startedAt,
-                stoppedAt: session.stoppedAt,
-                durationMs: session.durationMs,
-                durationSeconds: session.durationSeconds ?? Math.floor(session.durationMs / 1000),
-                locations,
-                savedAt: admin.firestore.Timestamp.now(),
-            }),
+            sessions: updatedSessions,
+            totalArea: totalArea || 0,
+            mergedTerritory: mergedTerritory ? JSON.stringify(mergedTerritory) : null,
             lastUpdate: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        res.status(200).json({ nachricht: "Session gespeichert." });
+        res.status(200).json({ nachricht: "Session gespeichert.", totalArea });
     } catch (error) {
         res.status(500).json({ fehler: error.message });
     }
@@ -193,33 +206,47 @@ exports.getFriends = async (req, res) => {
     }
 };
 
+exports.getUserTerritory = async (req, res) => {
+    try {
+        const email = normalizeEmail(req.query.email);
+        console.log("Fetching territory for email:", email);
+        
+        if (!email) {
+            return res.status(400).json({ fehler: "E-Mail fehlt." });
+        }
+
+        const userRef = db.collection('users').doc(email);
+        const doc = await userRef.get();
+
+        if (!doc.exists) {
+            console.log("User not found in Firestore:", email);
+            return res.status(404).json({ fehler: "Benutzer nicht gefunden." });
+        }
+
+        const data = doc.data();
+        console.log("Successfully fetched data for:", email, "Area:", data.totalArea);
+        
+        res.status(200).json({
+            email: doc.id,
+            totalArea: data.totalArea || 0,
+            mergedTerritory: data.mergedTerritory || null,
+            displayName: data.userData?.displayName || data.username || data.name || doc.id
+        });
+    } catch (error) {
+        console.error("Error in getUserTerritory:", error.message);
+        res.status(500).json({ fehler: error.message });
+    }
+};
+
 exports.getLeaderboard = async (req, res) => {
     try {
         const snapshot = await db.collection('users').get();
 
         const leaderboard = snapshot.docs.map((doc, index) => {
             const data = doc.data();
-            const sessions = Array.isArray(data.sessions) ? data.sessions : [];
-
-            const allLocations = sessions.flatMap((session) =>
-                Array.isArray(session.locations) ? session.locations : []
-            );
-
-            const uniquePoints = new Set(
-                allLocations
-                    .filter(
-                        (loc) =>
-                            loc &&
-                            typeof loc.latitude === 'number' &&
-                            typeof loc.longitude === 'number'
-                    )
-                    .map(
-                        (loc) =>
-                            `${loc.latitude.toFixed(5)}-${loc.longitude.toFixed(5)}`
-                    )
-            );
-
-            const score = uniquePoints.size;
+            
+            // Use pre-calculated totalArea, fallback to 0
+            const score = Math.round(data.totalArea || 0);
 
             return {
                 id: doc.id || index + 1,
