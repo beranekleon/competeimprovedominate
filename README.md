@@ -19,7 +19,7 @@ To ensure performance and scalability our project is built with:
 - [x] user auth.
 - [x] real-time cloud data sync.
 - [x] GPS-based territory mapping
-- [ ] Leaderboard and Social Interaction
+- [x] Leaderboard and Social Interaction
 - [ ] Fitness API Integration
 
 ---
