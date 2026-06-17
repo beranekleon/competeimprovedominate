@@ -2,6 +2,7 @@
 
 ## Project Overview
 This repository contains the complete codebase for our (see contributors) practise diploma project in a monorepo.
+Work on this project has been concluded by the original team, further additions may be added in the future.
 
 ## The Goal
 We aim to create an app that makes it easy for users to stay active and exercise by:
